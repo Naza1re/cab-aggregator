@@ -1,12 +1,12 @@
-package com.modsen.passengerservice.response;
+package com.modsen.passengerservice.dto.response;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 public class PassengerResponse {
-
     private Long id;
 
     private String name;

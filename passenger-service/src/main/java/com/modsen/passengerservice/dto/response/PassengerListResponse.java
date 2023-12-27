@@ -1,4 +1,4 @@
-package com.modsen.passengerservice.response;
+package com.modsen.passengerservice.dto.response;
 
 import lombok.Getter;
 import lombok.Setter;

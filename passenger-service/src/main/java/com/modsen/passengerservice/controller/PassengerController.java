@@ -1,13 +1,14 @@
 package com.modsen.passengerservice.controller;
 
 import com.modsen.passengerservice.exception.PassengerNotFoundException;
-import com.modsen.passengerservice.request.PassengerRequest;
-import com.modsen.passengerservice.response.PassengerListResponse;
-import com.modsen.passengerservice.response.PassengerResponse;
+import com.modsen.passengerservice.dto.request.PassengerRequest;
+import com.modsen.passengerservice.dto.response.PassengerListResponse;
+import com.modsen.passengerservice.dto.response.PassengerResponse;
 import com.modsen.passengerservice.service.PassengerService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity;import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -26,15 +27,17 @@ public class PassengerController {
         return passengerService.getAllPassengers();
     }
     @PostMapping("/create-passenger")
-    public ResponseEntity<PassengerResponse> createPassenger(@RequestBody PassengerRequest passengerRequest){
+    public ResponseEntity<?> createPassenger(
+            @RequestBody PassengerRequest passengerRequest) {
         return passengerService.createPassenger(passengerRequest);
     }
+
     @DeleteMapping("/{id}/delete")
     public HttpStatus deletePassenger(@PathVariable Long id) throws PassengerNotFoundException {
         return passengerService.deletePassenger(id);
     }
     @PutMapping("/{id}/update")
-    public ResponseEntity<PassengerResponse> updatePassenger(@RequestBody PassengerRequest passengerRequest, @PathVariable Long id) throws PassengerNotFoundException {
+    public ResponseEntity<?> updatePassenger( @RequestBody PassengerRequest passengerRequest, @PathVariable Long id) throws PassengerNotFoundException {
         return passengerService.updatePassenger(id,passengerRequest);
     }
 

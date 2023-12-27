@@ -3,9 +3,12 @@ package com.modsen.passengerservice.service;
 import com.modsen.passengerservice.exception.PassengerNotFoundException;
 import com.modsen.passengerservice.model.Passenger;
 import com.modsen.passengerservice.repository.PassengerRepository;
-import com.modsen.passengerservice.request.PassengerRequest;
-import com.modsen.passengerservice.response.PassengerListResponse;
-import com.modsen.passengerservice.response.PassengerResponse;
+import com.modsen.passengerservice.dto.request.PassengerRequest;
+import com.modsen.passengerservice.dto.response.PassengerListResponse;
+import com.modsen.passengerservice.dto.response.PassengerResponse;
+import com.modsen.passengerservice.validation.ValidationResult;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -13,13 +16,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PassengerService {
     private final PassengerRepository passengerRepository;
     private final ModelMapper modelMapper;
+    private final Validator validator;
 
 
     public PassengerResponse fromEntityToResponse(Passenger passenger){
@@ -48,20 +55,35 @@ public class PassengerService {
         return new ResponseEntity<>(passengerListResponse,HttpStatus.OK);
     }
 
-    public ResponseEntity<PassengerResponse> createPassenger(PassengerRequest passengerRequest) {
-        return new ResponseEntity<>(fromEntityToResponse(passengerRepository.save(fromRequestToEntity(passengerRequest))),HttpStatus.OK);
+    public ResponseEntity<?> createPassenger(PassengerRequest passengerRequest) {
+        ValidationResult validationResult = validatePassengerRequest(passengerRequest);
+        if (!validationResult.isValid()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationResult);
+        }
+
+        Passenger passenger = fromRequestToEntity(passengerRequest);
+        Passenger savedPassenger = passengerRepository.save(passenger);
+
+        return new ResponseEntity<>(fromEntityToResponse(savedPassenger), HttpStatus.OK);
+    }
+    public ResponseEntity<?> updatePassenger(Long id, PassengerRequest passengerRequest)
+            throws PassengerNotFoundException {
+        ValidationResult validationResult = validatePassengerRequest(passengerRequest);
+        if (!validationResult.isValid()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationResult);
+        }
+
+        Optional<Passenger> opt_passenger = passengerRepository.findById(id);
+        if (opt_passenger.isPresent()) {
+            Passenger passenger = fromRequestToEntity(passengerRequest);
+            passenger.setId(id);
+            return new ResponseEntity<>(fromEntityToResponse(passengerRepository.save(passenger)), HttpStatus.OK);
+        } else {
+            throw new PassengerNotFoundException("passenger with id '" + id + "' not found");
+        }
     }
 
-    public ResponseEntity<PassengerResponse> updatePassenger(Long id, PassengerRequest passengerRequest) throws PassengerNotFoundException {
-            Optional<Passenger> opt_passenger = passengerRepository.findById(id);
-            if(opt_passenger.isPresent()){
-                Passenger passenger = fromRequestToEntity(passengerRequest);
-                passenger.setId(id);
-                return new ResponseEntity<>(fromEntityToResponse(passengerRepository.save(passenger)),HttpStatus.OK);
-            }
-            else
-                throw new PassengerNotFoundException("passenger with id '"+id+"' not found");
-    }
+
 
     public HttpStatus deletePassenger(Long id) throws PassengerNotFoundException {
         Optional<Passenger> opt_passenger = passengerRepository.findById(id);
@@ -72,4 +94,15 @@ public class PassengerService {
         else
             throw new PassengerNotFoundException("passenger with id '"+id+"' no found");
     }
+
+    private ValidationResult validatePassengerRequest(PassengerRequest passengerRequest) {
+        Set<ConstraintViolation<PassengerRequest>> violations = validator.validate(passengerRequest);
+        Map<String, String> errorMap = violations.stream()
+                .collect(Collectors.toMap(
+                        violation -> violation.getPropertyPath().toString(),
+                        ConstraintViolation::getMessage
+                ));
+        return new ValidationResult(errorMap);
+    }
+
 }
