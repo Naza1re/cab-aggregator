@@ -1,7 +1,6 @@
 package com.modsen.passengerservice.model;
 
 import jakarta.persistence.*;
-import jdk.jfr.Enabled;
 import lombok.Getter;
 import lombok.Setter;
 

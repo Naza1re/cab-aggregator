@@ -8,6 +8,7 @@ import com.modsen.passengerservice.response.PassengerListResponse;
 import com.modsen.passengerservice.response.PassengerResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public class PassengerService {
     private final ModelMapper modelMapper;
 
 
-    public PassengerResponse fromEntityToRequest(Passenger passenger){
+    public PassengerResponse fromEntityToResponse(Passenger passenger){
         return modelMapper.map(passenger,PassengerResponse.class);
     }
     public Passenger fromRequestToEntity(PassengerRequest passengerRequest){
@@ -30,7 +31,7 @@ public class PassengerService {
     public PassengerResponse getPassengerById(Long id) throws PassengerNotFoundException {
         Optional<Passenger> opt_passenger = passengerRepository.findById(id);
         if(opt_passenger.isPresent()){
-            return opt_passenger.map(this::fromEntityToRequest).get();
+            return opt_passenger.map(this::fromEntityToResponse).get();
         }
         else
             throw new PassengerNotFoundException("passenger with id '"+id+"' not found");
@@ -39,11 +40,35 @@ public class PassengerService {
     public PassengerListResponse getAllPassengers(){
         List<PassengerResponse> opt_listOfPassengers = passengerRepository.findAll()
                 .stream()
-                .map(this::fromEntityToRequest)
+                .map(this::fromEntityToResponse)
                 .toList();
-        return new PassengerListResponse(opt_listOfPassengers);
+        PassengerListResponse passengerListResponse = new PassengerListResponse();
+        passengerListResponse.setListOfPassengers(opt_listOfPassengers);
+        return passengerListResponse;
     }
 
+    public PassengerResponse createPassenger(PassengerRequest passengerRequest) {
+        return fromEntityToResponse(passengerRepository.save(fromRequestToEntity(passengerRequest)));
+    }
 
+    public PassengerResponse updatePassenger(Long id, PassengerRequest passengerRequest) throws PassengerNotFoundException {
+            Optional<Passenger> opt_passenger = passengerRepository.findById(id);
+            if(opt_passenger.isPresent()){
+                Passenger passenger = fromRequestToEntity(passengerRequest);
+                passenger.setId(id);
+                return fromEntityToResponse(passengerRepository.save(passenger));
+            }
+            else
+                throw new PassengerNotFoundException("passenger with id '"+id+"' not found");
+    }
 
+    public HttpStatus deletePassenger(Long id) throws PassengerNotFoundException {
+        Optional<Passenger> opt_passenger = passengerRepository.findById(id);
+        if(opt_passenger.isPresent()){
+            passengerRepository.delete(opt_passenger.get());
+            return HttpStatus.OK;
+        }
+        else
+            throw new PassengerNotFoundException("passenger with id '"+id+"' no found");
+    }
 }
