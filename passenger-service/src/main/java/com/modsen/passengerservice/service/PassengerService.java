@@ -16,10 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,8 +40,9 @@ public class PassengerService {
             return new ResponseEntity<>(opt_passenger.map(this::fromEntityToResponse).get(),HttpStatus.OK);
         }
         else
-            throw new PassengerNotFoundException("passenger with id '"+id+"' not found");
+            throw new PassengerNotFoundException("Passenger with id '"+id+"' not found");
     }
+
 
     public ResponseEntity<PassengerListResponse> getAllPassengers(){
           List<PassengerResponse> opt_listOfPassengers = passengerRepository.findAll()
@@ -55,6 +53,7 @@ public class PassengerService {
         passengerListResponse.setListOfPassengers(opt_listOfPassengers);
         return new ResponseEntity<>(passengerListResponse,HttpStatus.OK);
     }
+
 
     public ResponseEntity<PassengerResponse> createPassenger(PassengerRequest passengerRequest) throws ValidateException {
         ValidationResult validationResult = validatePassengerRequest(passengerRequest);
@@ -67,6 +66,7 @@ public class PassengerService {
 
         return new ResponseEntity<>(fromEntityToResponse(savedPassenger), HttpStatus.OK);
     }
+
     public ResponseEntity<PassengerResponse> updatePassenger(Long id, PassengerRequest passengerRequest)
             throws PassengerNotFoundException, ValidateException {
         ValidationResult validationResult = validatePassengerRequest(passengerRequest);
@@ -80,12 +80,11 @@ public class PassengerService {
             passenger.setId(id);
             return new ResponseEntity<>(fromEntityToResponse(passengerRepository.save(passenger)), HttpStatus.OK);
         } else {
-            throw new PassengerNotFoundException("passenger with id '" + id + "' not found");
+            throw new PassengerNotFoundException("Passenger with id '" + id + "' not found");
         }
     }
 
-
-
+    
     public HttpStatus deletePassenger(Long id) throws PassengerNotFoundException {
         Optional<Passenger> opt_passenger = passengerRepository.findById(id);
         if(opt_passenger.isPresent()){
@@ -93,7 +92,7 @@ public class PassengerService {
             return HttpStatus.OK;
         }
         else
-            throw new PassengerNotFoundException("passenger with id '"+id+"' no found");
+            throw new PassengerNotFoundException("Passenger with id '"+id+"' no found");
     }
 
     private ValidationResult validatePassengerRequest(PassengerRequest passengerRequest) {

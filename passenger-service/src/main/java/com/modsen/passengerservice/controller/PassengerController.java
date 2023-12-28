@@ -7,6 +7,7 @@ import com.modsen.passengerservice.dto.response.PassengerResponse;
 import com.modsen.passengerservice.exception.ValidateException;
 import com.modsen.passengerservice.service.PassengerService;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;import org.springframework.validation.BindingResult;
@@ -41,5 +42,10 @@ public class PassengerController {
     public ResponseEntity<PassengerResponse> updatePassenger( @RequestBody PassengerRequest passengerRequest, @PathVariable Long id) throws PassengerNotFoundException, ValidateException {
         return passengerService.updatePassenger(id,passengerRequest);
     }
+
+    /*@GetMapping("/get-sorted-list-of-passengers")
+    public ResponseEntity<PassengerListResponse> getSortedListOfPassengers(@RequestParam String type_of_sort){
+        return passengerService.getSortedListOfPassengers(type_of_sort);
+    }*/
 
 }
