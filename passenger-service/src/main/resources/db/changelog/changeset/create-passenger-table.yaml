@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-author
+      author: Nazar
+      changes:
+        - createTable:
+            tableName: passenger
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: surname
+                  type: varchar(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: phone
+                  type: varchar(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(200)
+                  constraints:
+                    nullable: false
