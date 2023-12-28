@@ -19,4 +19,8 @@ public class PassengerRequest {
 
     @Pattern(regexp = "\\d{10}", message = "Phone must be a 10-digit number")
     private String phone;
+
+    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "Invalid email format")
+    private String email;
+
 }
