@@ -1,6 +1,7 @@
 package com.modsen.passengerservice.service;
 
 import com.modsen.passengerservice.exception.PassengerNotFoundException;
+import com.modsen.passengerservice.exception.ValidateException;
 import com.modsen.passengerservice.model.Passenger;
 import com.modsen.passengerservice.repository.PassengerRepository;
 import com.modsen.passengerservice.dto.request.PassengerRequest;
@@ -55,10 +56,10 @@ public class PassengerService {
         return new ResponseEntity<>(passengerListResponse,HttpStatus.OK);
     }
 
-    public ResponseEntity<?> createPassenger(PassengerRequest passengerRequest) {
+    public ResponseEntity<PassengerResponse> createPassenger(PassengerRequest passengerRequest) throws ValidateException {
         ValidationResult validationResult = validatePassengerRequest(passengerRequest);
         if (!validationResult.isValid()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationResult);
+            throw new ValidateException(validationResult.getErrors());
         }
 
         Passenger passenger = fromRequestToEntity(passengerRequest);
@@ -66,11 +67,11 @@ public class PassengerService {
 
         return new ResponseEntity<>(fromEntityToResponse(savedPassenger), HttpStatus.OK);
     }
-    public ResponseEntity<?> updatePassenger(Long id, PassengerRequest passengerRequest)
-            throws PassengerNotFoundException {
+    public ResponseEntity<PassengerResponse> updatePassenger(Long id, PassengerRequest passengerRequest)
+            throws PassengerNotFoundException, ValidateException {
         ValidationResult validationResult = validatePassengerRequest(passengerRequest);
         if (!validationResult.isValid()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationResult);
+            throw new ValidateException(validationResult.getErrors());
         }
 
         Optional<Passenger> opt_passenger = passengerRepository.findById(id);

@@ -4,6 +4,7 @@ import com.modsen.passengerservice.exception.PassengerNotFoundException;
 import com.modsen.passengerservice.dto.request.PassengerRequest;
 import com.modsen.passengerservice.dto.response.PassengerListResponse;
 import com.modsen.passengerservice.dto.response.PassengerResponse;
+import com.modsen.passengerservice.exception.ValidateException;
 import com.modsen.passengerservice.service.PassengerService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,8 +28,8 @@ public class PassengerController {
         return passengerService.getAllPassengers();
     }
     @PostMapping("/create-passenger")
-    public ResponseEntity<?> createPassenger(
-            @RequestBody PassengerRequest passengerRequest) {
+    public ResponseEntity<PassengerResponse> createPassenger(
+            @RequestBody PassengerRequest passengerRequest) throws ValidateException {
         return passengerService.createPassenger(passengerRequest);
     }
 
@@ -37,7 +38,7 @@ public class PassengerController {
         return passengerService.deletePassenger(id);
     }
     @PutMapping("/{id}/update")
-    public ResponseEntity<?> updatePassenger( @RequestBody PassengerRequest passengerRequest, @PathVariable Long id) throws PassengerNotFoundException {
+    public ResponseEntity<PassengerResponse> updatePassenger( @RequestBody PassengerRequest passengerRequest, @PathVariable Long id) throws PassengerNotFoundException, ValidateException {
         return passengerService.updatePassenger(id,passengerRequest);
     }
 

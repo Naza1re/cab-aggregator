@@ -4,7 +4,7 @@ import java.util.Map;
 
 
 public class ValidationResult {
-    private final Map<String, String> errors;
+    private  Map<String, String> errors;
 
     public ValidationResult(Map<String, String> errors) {
         this.errors = errors;
