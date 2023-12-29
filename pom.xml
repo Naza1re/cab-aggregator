@@ -8,7 +8,6 @@
     <artifactId>cab-aggregator</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <!-- Correct packaging type for aggregator projects -->
     <packaging>pom</packaging>
 
     <modules>

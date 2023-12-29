@@ -1,11 +1,8 @@
 package com.modsen.passengerservice.exception.handler;
 
+import com.modsen.passengerservice.exception.*;
 import com.modsen.passengerservice.exception.AppError.AppError;
 import com.modsen.passengerservice.exception.AppError.ValidateError;
-import com.modsen.passengerservice.exception.EmailAlreadyExistException;
-import com.modsen.passengerservice.exception.PassengerNotFoundException;
-import com.modsen.passengerservice.exception.PhoneAlreadyExistException;
-import com.modsen.passengerservice.exception.ValidateException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -37,6 +34,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EmailAlreadyExistException.class)
     public ResponseEntity<AppError> handleEmailAlreadyExistException(
             EmailAlreadyExistException ex){
+        String errorMessage = ex.getMessage();
+        return new ResponseEntity<>(new AppError(errorMessage),HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(SortTypeException.class)
+    public ResponseEntity<AppError> handleSortTypeException(
+            SortTypeException ex){
         String errorMessage = ex.getMessage();
         return new ResponseEntity<>(new AppError(errorMessage),HttpStatus.BAD_REQUEST);
     }

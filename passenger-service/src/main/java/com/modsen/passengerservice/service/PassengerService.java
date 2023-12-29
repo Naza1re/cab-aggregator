@@ -1,9 +1,6 @@
 package com.modsen.passengerservice.service;
 
-import com.modsen.passengerservice.exception.EmailAlreadyExistException;
-import com.modsen.passengerservice.exception.PassengerNotFoundException;
-import com.modsen.passengerservice.exception.PhoneAlreadyExistException;
-import com.modsen.passengerservice.exception.ValidateException;
+import com.modsen.passengerservice.exception.*;
 import com.modsen.passengerservice.model.Passenger;
 import com.modsen.passengerservice.repository.PassengerRepository;
 import com.modsen.passengerservice.dto.request.PassengerRequest;
@@ -14,6 +11,10 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -51,8 +52,7 @@ public class PassengerService {
                 .stream()
                 .map(this::fromEntityToResponse)
                 .toList();
-        PassengerListResponse passengerListResponse = new PassengerListResponse();
-        passengerListResponse.setListOfPassengers(opt_listOfPassengers);
+        PassengerListResponse passengerListResponse = new PassengerListResponse(opt_listOfPassengers);
         return new ResponseEntity<>(passengerListResponse,HttpStatus.OK);
     }
 
@@ -120,5 +120,39 @@ public class PassengerService {
             throw new PhoneAlreadyExistException("Passenger with phone '"+phone+"' already exist");
         }
     }
+
+
+    public ResponseEntity<PassengerListResponse> getSortedListOfPassengers(String type) throws SortTypeException {
+        List<Passenger> sortedPassengers;
+
+        switch (type.toLowerCase()) {
+            case "name":
+                sortedPassengers = passengerRepository.findAll(Sort.by(Sort.Order.asc("name")));
+                break;
+            case "surname":
+                sortedPassengers = passengerRepository.findAll(Sort.by(Sort.Order.asc("surname")));
+                break;
+
+            default:
+
+               throw new SortTypeException("Invalid type of sort");
+        }
+
+        return new ResponseEntity<>(new PassengerListResponse(sortedPassengers
+                .stream()
+                .map(this::fromEntityToResponse)
+                .toList()),HttpStatus.OK);
+
+    }
+
+    public ResponseEntity<Page<PassengerResponse>> getPaginationList(Integer offset, Integer limit) {
+        Pageable pageable = PageRequest.of(offset, limit);
+        Page<Passenger> passengerPage = passengerRepository.findAll(pageable);
+
+        Page<PassengerResponse> passengerResponsePage = passengerPage.map(this::fromEntityToResponse);
+
+        return ResponseEntity.ok(passengerResponsePage);
+    }
+
 
 }

@@ -1,16 +1,14 @@
 package com.modsen.passengerservice.controller;
 
-import com.modsen.passengerservice.exception.EmailAlreadyExistException;
-import com.modsen.passengerservice.exception.PassengerNotFoundException;
+import com.modsen.passengerservice.exception.*;
 import com.modsen.passengerservice.dto.request.PassengerRequest;
 import com.modsen.passengerservice.dto.response.PassengerListResponse;
 import com.modsen.passengerservice.dto.response.PassengerResponse;
-import com.modsen.passengerservice.exception.PhoneAlreadyExistException;
-import com.modsen.passengerservice.exception.ValidateException;
 import com.modsen.passengerservice.service.PassengerService;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -45,9 +43,16 @@ public class PassengerController {
         return passengerService.updatePassenger(id,passengerRequest);
     }
 
-    /*@GetMapping("/get-sorted-list-of-passengers")
-    public ResponseEntity<PassengerListResponse> getSortedListOfPassengers(@RequestParam String type_of_sort){
-        return passengerService.getSortedListOfPassengers(type_of_sort);
-    }*/
+    @GetMapping("/get-list-with-pagination")
+    public ResponseEntity<Page<PassengerResponse>> getSortedListOfPassengers(
+            @RequestParam("offset") Integer offset,
+            @RequestParam("limit") Integer limit
+    ){
+        return passengerService.getPaginationList(offset,limit);
+    }
+    @GetMapping("/sorted-list")
+    public ResponseEntity<PassengerListResponse> SortedListOfPassengers(@RequestParam String type) throws SortTypeException {
+        return passengerService.getSortedListOfPassengers(type);
+    }
 
 }
