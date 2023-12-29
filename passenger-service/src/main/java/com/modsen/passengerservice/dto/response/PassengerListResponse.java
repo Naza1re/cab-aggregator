@@ -7,7 +7,8 @@ import java.util.List;
 @Getter
 @Setter
 public class PassengerListResponse {
-    List<PassengerResponse> listOfPassengers;
+
+    private List<PassengerResponse> listOfPassengers;
 
 
 }

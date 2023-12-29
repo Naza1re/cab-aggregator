@@ -1,6 +1,8 @@
 package com.modsen.passengerservice.service;
 
+import com.modsen.passengerservice.exception.EmailAlreadyExistException;
 import com.modsen.passengerservice.exception.PassengerNotFoundException;
+import com.modsen.passengerservice.exception.PhoneAlreadyExistException;
 import com.modsen.passengerservice.exception.ValidateException;
 import com.modsen.passengerservice.model.Passenger;
 import com.modsen.passengerservice.repository.PassengerRepository;
@@ -55,11 +57,13 @@ public class PassengerService {
     }
 
 
-    public ResponseEntity<PassengerResponse> createPassenger(PassengerRequest passengerRequest) throws ValidateException {
+    public ResponseEntity<PassengerResponse> createPassenger(PassengerRequest passengerRequest) throws ValidateException, EmailAlreadyExistException, PhoneAlreadyExistException {
         ValidationResult validationResult = validatePassengerRequest(passengerRequest);
         if (!validationResult.isValid()) {
             throw new ValidateException(validationResult.getErrors());
         }
+        checkEmailExist(passengerRequest.getEmail());
+        checkPhoneExist(passengerRequest.getPhone());
 
         Passenger passenger = fromRequestToEntity(passengerRequest);
         Passenger savedPassenger = passengerRepository.save(passenger);
@@ -103,6 +107,18 @@ public class PassengerService {
                         ConstraintViolation::getMessage
                 ));
         return new ValidationResult(errorMap);
+    }
+    public void checkEmailExist(String email) throws EmailAlreadyExistException {
+        Optional<Passenger> opt_passenger = passengerRepository.findByEmail(email);
+        if(opt_passenger.isPresent()){
+            throw new EmailAlreadyExistException("Passenger with email '"+email+"' already exist");
+        }
+    }
+    public void checkPhoneExist(String phone) throws  PhoneAlreadyExistException {
+        Optional<Passenger> opt_passenger = passengerRepository.findByPhone(phone);
+        if(opt_passenger.isPresent()){
+            throw new PhoneAlreadyExistException("Passenger with phone '"+phone+"' already exist");
+        }
     }
 
 }

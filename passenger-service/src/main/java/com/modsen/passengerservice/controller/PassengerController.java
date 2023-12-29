@@ -1,9 +1,11 @@
 package com.modsen.passengerservice.controller;
 
+import com.modsen.passengerservice.exception.EmailAlreadyExistException;
 import com.modsen.passengerservice.exception.PassengerNotFoundException;
 import com.modsen.passengerservice.dto.request.PassengerRequest;
 import com.modsen.passengerservice.dto.response.PassengerListResponse;
 import com.modsen.passengerservice.dto.response.PassengerResponse;
+import com.modsen.passengerservice.exception.PhoneAlreadyExistException;
 import com.modsen.passengerservice.exception.ValidateException;
 import com.modsen.passengerservice.service.PassengerService;
 
@@ -30,7 +32,7 @@ public class PassengerController {
     }
     @PostMapping("/create-passenger")
     public ResponseEntity<PassengerResponse> createPassenger(
-            @RequestBody PassengerRequest passengerRequest) throws ValidateException {
+            @RequestBody PassengerRequest passengerRequest) throws ValidateException, EmailAlreadyExistException, PhoneAlreadyExistException {
         return passengerService.createPassenger(passengerRequest);
     }
 

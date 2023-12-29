@@ -16,10 +16,10 @@ public class PassengerRequest {
 
     @NotBlank(message = "Surname cannot be blank")
     private String surname;
-
-    @Pattern(regexp = "\\d{10}", message = "Phone must be a 10-digit number")
+    @NotBlank(message = "Phone cannot be blank")
+    @Pattern(regexp = "\\d{11}", message = "Phone must be a 11-digit number")
     private String phone;
-
+    @NotBlank(message = "Email cannot be blank")
     @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "Invalid email format")
     private String email;
 
