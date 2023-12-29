@@ -8,4 +8,6 @@ import lombok.Setter;
 public class DriverRequest {
     private String name;
     private String surname;
+    private String phone;
+    private String email;
 }
