@@ -4,6 +4,7 @@ import com.modsen.driverservice.dto.request.DriverRequest;
 import com.modsen.driverservice.dto.response.DriverListResponse;
 import com.modsen.driverservice.dto.response.DriverResponse;
 import com.modsen.driverservice.exception.DriverNotFoundException;
+import com.modsen.driverservice.exception.ValidationException;
 import com.modsen.driverservice.service.DriverService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,7 @@ public class DriverController {
     @PutMapping("/{id}/update")
     public ResponseEntity<DriverResponse> updateDriver(
             @PathVariable Long id,
-            @RequestBody DriverRequest driverRequest) throws DriverNotFoundException {
+            @RequestBody DriverRequest driverRequest) throws DriverNotFoundException, ValidationException {
         return driverService.updateDriver(id,driverRequest);
     }
     @DeleteMapping("/{id}/delete")
@@ -41,7 +42,7 @@ public class DriverController {
     }
     @PostMapping("/create-driver")
     public ResponseEntity<DriverResponse> createDriver(
-            @RequestBody DriverRequest driverRequest){
+            @RequestBody DriverRequest driverRequest) throws ValidationException {
         return driverService.createDriver(driverRequest);
     }
 }

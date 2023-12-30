@@ -1,4 +1,4 @@
-package com.modsen.driverservice.confi;
+package com.modsen.driverservice.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

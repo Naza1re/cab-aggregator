@@ -1,13 +1,12 @@
 package com.modsen.driverservice.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @Entity
 @Table(name = "driver")
 public class Driver {
@@ -17,5 +16,7 @@ public class Driver {
     private Long id;
     private String name;
     private String surname;
+    private String phone;
+    private String email;
 
 }
