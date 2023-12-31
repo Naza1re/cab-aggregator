@@ -18,5 +18,6 @@ public class Driver {
     private String surname;
     private String phone;
     private String email;
+    private boolean available;
 
 }

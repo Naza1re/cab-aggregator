@@ -3,14 +3,17 @@ package com.modsen.driverservice.service;
 import com.modsen.driverservice.dto.request.DriverRequest;
 import com.modsen.driverservice.dto.response.DriverListResponse;
 import com.modsen.driverservice.dto.response.DriverResponse;
-import com.modsen.driverservice.exception.DriverNotFoundException;
-import com.modsen.driverservice.exception.ValidationException;
+import com.modsen.driverservice.exception.*;
 import com.modsen.driverservice.model.Driver;
 import com.modsen.driverservice.repository.DriverRepository;
 import com.modsen.driverservice.validation.ValidationResult;
 
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.*;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -56,11 +59,13 @@ public class DriverService {
         return new ResponseEntity<>(new DriverListResponse(driverResponseList),HttpStatus.OK);
     }
 
-    public ResponseEntity<DriverResponse> updateDriver(Long id, DriverRequest driverRequest) throws DriverNotFoundException, ValidationException {
+    public ResponseEntity<DriverResponse> updateDriver(Long id, DriverRequest driverRequest) throws DriverNotFoundException, ValidationException, EmailAlreadyExistException, PhoneAlreadyExistException {
         ValidationResult validationResult = validateDriverRequest(driverRequest);
         if (!validationResult.isValid()) {
             throw new ValidationException(validationResult.getErrors());
         }
+        checkEmailExist(driverRequest.getEmail());
+        checkPhoneExist(driverRequest.getPhone());
         Optional<Driver> opt_driver = driverRepository.findById(id);
         if(opt_driver.isPresent()){
             Driver driver = fromRequestToEntity(driverRequest);
@@ -72,13 +77,16 @@ public class DriverService {
 
     }
 
-    public ResponseEntity<DriverResponse> createDriver(DriverRequest driverRequest) throws ValidationException {
+    public ResponseEntity<DriverResponse> createDriver(DriverRequest driverRequest) throws ValidationException, EmailAlreadyExistException, PhoneAlreadyExistException {
         ValidationResult validationResult = validateDriverRequest(driverRequest);
         if (!validationResult.isValid()) {
             throw new ValidationException(validationResult.getErrors());
         }
+        checkEmailExist(driverRequest.getEmail());
+        checkPhoneExist(driverRequest.getPhone());
 
         Driver driver = fromRequestToEntity(driverRequest);
+        driver.setAvailable(true);
         Driver savedDriver = driverRepository.save(driver);
         return new ResponseEntity<>(fromEntityToResponse(savedDriver),HttpStatus.OK);
     }
@@ -102,11 +110,58 @@ public class DriverService {
         return new ValidationResult(errorMap);
     }
 
+    public void checkEmailExist(String email) throws EmailAlreadyExistException {
+        Optional<Driver> opt_driver = driverRepository.findByEmail(email);
+        if(opt_driver.isPresent()){
+            throw new EmailAlreadyExistException("driver with email '"+email+"' already exist");
+        }
+    }
+    public void checkPhoneExist(String email) throws PhoneAlreadyExistException {
+        Optional<Driver> opt_driver = driverRepository.findByEmail(email);
+        if(opt_driver.isPresent()){
+            throw new PhoneAlreadyExistException("driver with email '"+email+"' already exist");
+        }
+    }
 
 
+    public ResponseEntity<DriverListResponse> getAvailableDrivers() {
+        List<Driver> listOfAvailableDrivers = driverRepository.getAllByAvailable(true);
+        List<DriverResponse> listOfAvailable =  listOfAvailableDrivers
+                .stream()
+                .map(this::fromEntityToResponse)
+                .toList();
+        return new ResponseEntity<>(new DriverListResponse(listOfAvailable),HttpStatus.OK);
+    }
 
 
+    public ResponseEntity<Page<DriverResponse>> getPaginationList(Integer offset, Integer limit) {
+        Pageable pageable = PageRequest.of(offset, limit);
+        Page<Driver> passengerPage = driverRepository.findAll(pageable);
 
+        Page<DriverResponse> passengerResponsePage = passengerPage.map(this::fromEntityToResponse);
 
+        return ResponseEntity.ok(passengerResponsePage);
+    }
 
+    public ResponseEntity<DriverListResponse> getSortedListOfPassengers(String type) throws SortTypeException {
+        List<Driver> sortedPassengers;
+
+        switch (type.toLowerCase()) {
+            case "name":
+                sortedPassengers = driverRepository.findAll(Sort.by(Sort.Order.asc("name")));
+                break;
+            case "surname":
+                sortedPassengers = driverRepository.findAll(Sort.by(Sort.Order.asc("surname")));
+                break;
+
+            default:
+
+                throw new SortTypeException("Invalid type of sort");
+        }
+
+        return new ResponseEntity<>(new DriverListResponse(sortedPassengers
+                .stream()
+                .map(this::fromEntityToResponse)
+                .toList()),HttpStatus.OK);
+    }
 }

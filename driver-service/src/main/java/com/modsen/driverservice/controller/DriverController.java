@@ -3,11 +3,10 @@ package com.modsen.driverservice.controller;
 import com.modsen.driverservice.dto.request.DriverRequest;
 import com.modsen.driverservice.dto.response.DriverListResponse;
 import com.modsen.driverservice.dto.response.DriverResponse;
-import com.modsen.driverservice.exception.DriverNotFoundException;
-import com.modsen.driverservice.exception.ValidationException;
+import com.modsen.driverservice.exception.*;
 import com.modsen.driverservice.service.DriverService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +31,7 @@ public class DriverController {
     @PutMapping("/{id}/update")
     public ResponseEntity<DriverResponse> updateDriver(
             @PathVariable Long id,
-            @RequestBody DriverRequest driverRequest) throws DriverNotFoundException, ValidationException {
+            @RequestBody DriverRequest driverRequest) throws DriverNotFoundException, ValidationException, PhoneAlreadyExistException, EmailAlreadyExistException {
         return driverService.updateDriver(id,driverRequest);
     }
     @DeleteMapping("/{id}/delete")
@@ -42,7 +41,28 @@ public class DriverController {
     }
     @PostMapping("/create-driver")
     public ResponseEntity<DriverResponse> createDriver(
-            @RequestBody DriverRequest driverRequest) throws ValidationException {
+            @RequestBody DriverRequest driverRequest) throws ValidationException, EmailAlreadyExistException, PhoneAlreadyExistException {
         return driverService.createDriver(driverRequest);
+    }
+
+    @GetMapping("/get-list-with-pagination")
+    public ResponseEntity<Page<DriverResponse>> getSortedListOfDrivers(
+            @RequestParam("offset") Integer offset,
+            @RequestParam("limit") Integer limit
+    ){
+        return driverService.getPaginationList(offset,limit);
+    }
+
+    @GetMapping("/sorted-list")
+    public ResponseEntity<DriverListResponse> SortedListOfDrivers(@RequestParam String type) throws  SortTypeException {
+        return driverService.getSortedListOfPassengers(type);
+    }
+
+
+
+
+    @GetMapping("/get-available-drivers")
+    public ResponseEntity<DriverListResponse> getAvailableDrivers(){
+        return driverService.getAvailableDrivers();
     }
 }
