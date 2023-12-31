@@ -59,8 +59,6 @@ public class DriverController {
     }
 
 
-
-
     @GetMapping("/get-available-drivers")
     public ResponseEntity<DriverListResponse> getAvailableDrivers(){
         return driverService.getAvailableDrivers();
