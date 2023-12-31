@@ -164,4 +164,26 @@ public class DriverService {
                 .map(this::fromEntityToResponse)
                 .toList()),HttpStatus.OK);
     }
+
+    public ResponseEntity<DriverResponse> startRideWithDriverId(Long driverId) throws DriverNotFoundException {
+        Optional<Driver> opt_driver = driverRepository.findById(driverId);
+        if(opt_driver.isPresent()){
+            opt_driver.get().setAvailable(false);
+            driverRepository.save(opt_driver.get());
+            return new ResponseEntity<>(fromEntityToResponse(opt_driver.get()),HttpStatus.OK);
+        }
+        else
+            throw new DriverNotFoundException("Driver with id '"+driverId+"' not found");
+    }
+
+    public ResponseEntity<DriverResponse> endRide(Long driverId) throws DriverNotFoundException {
+        Optional<Driver> opt_driver = driverRepository.findById(driverId);
+        if(opt_driver.isPresent()){
+            opt_driver.get().setAvailable(true);
+            driverRepository.save(opt_driver.get());
+            return new ResponseEntity<>(fromEntityToResponse(opt_driver.get()),HttpStatus.OK);
+        }
+        else
+            throw new DriverNotFoundException("Driver with id '"+driverId+"' not found");
+    }
 }

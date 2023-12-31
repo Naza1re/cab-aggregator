@@ -57,10 +57,16 @@ public class DriverController {
     public ResponseEntity<DriverListResponse> SortedListOfDrivers(@RequestParam String type) throws  SortTypeException {
         return driverService.getSortedListOfPassengers(type);
     }
-
-
     @GetMapping("/get-available-drivers")
     public ResponseEntity<DriverListResponse> getAvailableDrivers(){
         return driverService.getAvailableDrivers();
+    }
+    @PutMapping("/start-ride/{driver_id}")
+    public ResponseEntity<DriverResponse> startRide(@PathVariable("driver_id") Long driver_id) throws DriverNotFoundException {
+        return driverService.startRideWithDriverId(driver_id);
+    }
+    @PutMapping("/end-ride/{driver_id}")
+    public ResponseEntity<DriverResponse> endRide(@PathVariable("driver_id") Long driver_id) throws DriverNotFoundException {
+        return driverService.endRide(driver_id);
     }
 }
