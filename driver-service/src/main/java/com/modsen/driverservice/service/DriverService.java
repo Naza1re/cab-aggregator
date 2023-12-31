@@ -144,20 +144,11 @@ public class DriverService {
     }
 
     public ResponseEntity<DriverListResponse> getSortedListOfPassengers(String type) throws SortTypeException {
-        List<Driver> sortedPassengers;
-
-        switch (type.toLowerCase()) {
-            case "name":
-                sortedPassengers = driverRepository.findAll(Sort.by(Sort.Order.asc("name")));
-                break;
-            case "surname":
-                sortedPassengers = driverRepository.findAll(Sort.by(Sort.Order.asc("surname")));
-                break;
-
-            default:
-
-                throw new SortTypeException("Invalid type of sort");
-        }
+        List<Driver> sortedPassengers = switch (type.toLowerCase()) {
+            case "name" -> driverRepository.findAll(Sort.by(Sort.Order.asc("name")));
+            case "surname" -> driverRepository.findAll(Sort.by(Sort.Order.asc("surname")));
+            default -> throw new SortTypeException("Invalid type of sort");
+        };
 
         return new ResponseEntity<>(new DriverListResponse(sortedPassengers
                 .stream()
