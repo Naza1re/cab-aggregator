@@ -1,4 +1,7 @@
 package com.example.rideservice.exception;
 
-public class RideNotFoundException {
+public class RideNotFoundException extends Throwable {
+    public RideNotFoundException(String s) {
+        super(s);
+    }
 }
