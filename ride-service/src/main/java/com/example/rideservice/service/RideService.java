@@ -1,6 +1,6 @@
 package com.example.rideservice.service;
 
-import com.example.rideservice.dto.RideResponse;
+import com.example.rideservice.dto.response.RideResponse;
 import com.example.rideservice.exception.RideNotFoundException;
 import com.example.rideservice.model.Driver;
 import com.example.rideservice.model.Passenger;

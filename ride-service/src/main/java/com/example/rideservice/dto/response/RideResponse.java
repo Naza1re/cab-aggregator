@@ -1,17 +1,15 @@
-package com.example.rideservice.model;
+package com.example.rideservice.dto.response;
 
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
+@Getter
+@Setter
+public class RideResponse {
 
-@Data
-@Entity
-@Table(name = "ride")
-public class Ride {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Long driver_id;
@@ -29,7 +27,5 @@ public class Ride {
     private double price;
 
     private boolean isActive;
-
-    private String instructions;
 
 }

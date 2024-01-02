@@ -1,14 +1,12 @@
 package com.example.rideservice.controller;
 
-import com.example.rideservice.dto.RideResponse;
+import com.example.rideservice.dto.response.RideResponse;
 import com.example.rideservice.exception.RideNotFoundException;
 import com.example.rideservice.model.Driver;
 import com.example.rideservice.model.Passenger;
-import com.example.rideservice.model.Ride;
 import com.example.rideservice.service.RideService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

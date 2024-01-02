@@ -1,0 +1,60 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-ride
+      author: Nazar
+      changes:
+        - createTable:
+            tableName: ride
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: driver_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+              - column:
+                  name: passenger_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+              - column:
+                  name: pickUpAddress
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: dropOffAddress
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: startDate
+                  type: date
+                  constraints:
+                    nullable: true
+              - column:
+                  name: endDate
+                  type: date
+                  constraints:
+                    nullable: true
+              - column:
+                  name: price
+                  type: double
+                  constraints:
+                    nullable: true
+              - column:
+                  name: isActive
+                  type: boolean
+                  constraints:
+                    nullable: true
+              - column:
+                  name: instructions
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
