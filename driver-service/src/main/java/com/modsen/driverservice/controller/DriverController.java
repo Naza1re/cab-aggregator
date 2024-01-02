@@ -69,4 +69,12 @@ public class DriverController {
     public ResponseEntity<DriverResponse> endRide(@PathVariable("driver_id") Long driver_id) throws DriverNotFoundException {
         return driverService.endRide(driver_id);
     }
+    @PutMapping("/{driver_id}/start-working-day")
+    public HttpStatus startWorkingDayForDriverWithId(@PathVariable("driver_id") Long id) throws DriverNotFoundException {
+        return driverService.startWorkingDay(id);
+    }
+    @PutMapping("/{driver_id/end-working-day}")
+    public HttpStatus endWorkingDayForDriverWithId(@PathVariable Long driver_id) throws DriverNotFoundException {
+        return driverService.endWorkingDay(driver_id);
+    }
 }

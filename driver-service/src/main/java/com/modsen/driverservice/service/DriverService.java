@@ -86,7 +86,7 @@ public class DriverService {
         checkPhoneExist(driverRequest.getPhone());
 
         Driver driver = fromRequestToEntity(driverRequest);
-        driver.setAvailable(true);
+        driver.setAvailable(false);
         Driver savedDriver = driverRepository.save(driver);
         return new ResponseEntity<>(fromEntityToResponse(savedDriver),HttpStatus.OK);
     }
@@ -176,5 +176,26 @@ public class DriverService {
         }
         else
             throw new DriverNotFoundException("Driver with id '"+driverId+"' not found");
+    }
+
+    public HttpStatus startWorkingDay(Long id) throws DriverNotFoundException {
+        Optional<Driver> opt_driver = driverRepository.findById(id);
+        if(opt_driver.isPresent()){
+            opt_driver.get().setAvailable(true);
+            driverRepository.save(opt_driver.get());
+            return HttpStatus.OK;
+        }
+        else
+            throw new DriverNotFoundException("Driver with id '"+id+"' not found");
+    }
+    public HttpStatus endWorkingDay(Long id) throws DriverNotFoundException {
+        Optional<Driver> opt_driver = driverRepository.findById(id);
+        if(opt_driver.isPresent()){
+            opt_driver.get().setAvailable(false);
+            driverRepository.save(opt_driver.get());
+            return HttpStatus.OK;
+        }
+        else
+            throw new DriverNotFoundException("Driver with id '"+id+"' not found");
     }
 }
