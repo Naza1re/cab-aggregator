@@ -1,5 +1,6 @@
 package com.example.rideservice.service;
 
+import com.example.rideservice.dto.response.RideListResponse;
 import com.example.rideservice.dto.response.RideResponse;
 import com.example.rideservice.exception.RideNotFoundException;
 import com.example.rideservice.model.Driver;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -59,5 +61,22 @@ public class RideService {
         else
             throw new RideNotFoundException("Ride with id '"+rideId+"' not found");
 
+    }
+
+    public ResponseEntity<RideListResponse> getListOfRidesByPassengerId(Long passengerId) {
+        List<RideResponse> rideList = rideRepository.getAllByPassenger_id(passengerId)
+                .stream()
+                .map(this::fromEntityToResponse)
+                .toList();
+        RideListResponse response = new RideListResponse(rideList);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+    public ResponseEntity<RideListResponse> getListOfRidesByDriverId(Long driverId) {
+        List<RideResponse> rideList = rideRepository.getAllByDriver_id(driverId)
+                .stream()
+                .map(this::fromEntityToResponse)
+                .toList();
+        RideListResponse response = new RideListResponse(rideList);
+        return new ResponseEntity<>(response,HttpStatus.OK);
     }
 }
