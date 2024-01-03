@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: V1.1__add_new_columns
+      author: Nazar
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: color
+                  type: varchar(200)
+              - column:
+                  name: model
+                  type: varchar(200)
+            tableName: drivers
