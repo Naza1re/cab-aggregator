@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: V1.1__add_new_column_number
+      author: Nazar
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: number
+                  type: varchar(200)
+            tableName: drivers

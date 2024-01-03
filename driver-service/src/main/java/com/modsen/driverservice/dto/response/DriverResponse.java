@@ -14,4 +14,7 @@ public class DriverResponse {
     private String phone;
     private String email;
     private boolean available;
+    private String number;
+    private String color;
+    private String model;
 }

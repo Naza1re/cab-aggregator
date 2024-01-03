@@ -198,4 +198,13 @@ public class DriverService {
         else
             throw new DriverNotFoundException("Driver with id '"+id+"' not found");
     }
+
+    public ResponseEntity<DriverResponse> getDriverByCarNumber(String carNumber) throws DriverNotFoundException {
+        Optional<Driver> opt_driver = driverRepository.findByNumber(carNumber);
+        if(opt_driver.isPresent()){
+            return new ResponseEntity<>(fromEntityToResponse(opt_driver.get()),HttpStatus.OK);
+        }
+        else
+            throw new DriverNotFoundException("Driver with car number '"+carNumber+"' not found");
+    }
 }

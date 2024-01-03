@@ -77,4 +77,9 @@ public class DriverController {
     public HttpStatus endWorkingDayForDriverWithId(@PathVariable Long driver_id) throws DriverNotFoundException {
         return driverService.endWorkingDay(driver_id);
     }
+    @GetMapping("/get-driver-by-car-number/{car_number}")
+    public ResponseEntity<DriverResponse> getDriverByCarNumber(@PathVariable String car_number) throws DriverNotFoundException {
+        return driverService.getDriverByCarNumber(car_number);
+    }
+
 }

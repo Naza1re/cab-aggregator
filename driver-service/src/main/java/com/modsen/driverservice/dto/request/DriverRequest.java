@@ -19,4 +19,8 @@ public class DriverRequest {
     @NotBlank(message = "Email cannot be blank")
     @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "Invalid email format")
     private String email;
+
+    private String number;
+    private String color;
+    private String model;
 }
