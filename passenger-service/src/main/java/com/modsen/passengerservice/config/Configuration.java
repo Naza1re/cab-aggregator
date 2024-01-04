@@ -1,4 +1,4 @@
-package com.modsen.passengerservice.dto;
+package com.modsen.passengerservice.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

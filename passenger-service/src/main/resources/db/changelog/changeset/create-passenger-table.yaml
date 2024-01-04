@@ -2,6 +2,12 @@ databaseChangeLog:
   - changeSet:
       id: create-author
       author: Nazar
+      preConditions:
+        - onFail: MARK_RAN
+          or:
+          - not:
+          tableExists:
+          tableName: passenger
       changes:
         - createTable:
             tableName: passenger
@@ -33,3 +39,7 @@ databaseChangeLog:
                   type: varchar(200)
                   constraints:
                     nullable: false
+      rollback:
+        - dropTable:
+            tableName: passengers
+
