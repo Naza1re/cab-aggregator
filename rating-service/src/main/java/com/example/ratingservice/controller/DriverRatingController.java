@@ -1,6 +1,7 @@
 package com.example.ratingservice.controller;
 
 import com.example.ratingservice.dto.responce.DriverResponse;
+import com.example.ratingservice.exception.DriverAlreadyExistException;
 import com.example.ratingservice.exception.DriverRatingNotFoundException;
 import com.example.ratingservice.service.DriverRatingService;
 import lombok.Getter;
@@ -22,7 +23,7 @@ public class DriverRatingController {
     }
 
     @PostMapping("/{driver_id}/create-driver-rate")
-    public HttpStatus createDriverRecord(@PathVariable Long driver_id){
+    public HttpStatus createDriverRecord(@PathVariable Long driver_id) throws DriverAlreadyExistException {
         return driverRatingService.createDriver(driver_id);
     }
     @PutMapping("/{driver_id}/update-driver-rating")

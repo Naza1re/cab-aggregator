@@ -10,8 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import javax.swing.text.html.Option;
 import java.util.Optional;
 
 @Service
@@ -29,7 +27,8 @@ public class DriverRatingService {
             throw new DriverRatingNotFoundException("Driver record with driver id '"+driverId+"' not found");
     }
 
-    public HttpStatus createDriver(Long driverId) {
+    public HttpStatus createDriver(Long driverId) throws DriverAlreadyExistException {
+        checkDriverExist(driverId);
         DriverRating driverRating = new DriverRating();
         driverRating.setDriver_id(driverId);
         driverRating.setRate(5.0);
