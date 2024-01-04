@@ -9,8 +9,8 @@ import lombok.Data;
 public class DriverRating {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "driver_id")
     private Long id;
+    private Long driver_id;
     private double rate;
 
 

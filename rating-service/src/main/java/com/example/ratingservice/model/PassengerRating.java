@@ -9,7 +9,7 @@ import lombok.Data;
 public class PassengerRating {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "passenger_id")
     private Long id;
+    private Long passenger_id;
     private double rate;
 }
