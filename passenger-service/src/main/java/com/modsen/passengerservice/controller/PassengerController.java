@@ -6,6 +6,7 @@ import com.modsen.passengerservice.dto.response.PassengerListResponse;
 import com.modsen.passengerservice.dto.response.PassengerResponse;
 import com.modsen.passengerservice.service.PassengerService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -29,7 +30,7 @@ public class PassengerController {
     }
     @PostMapping("/create-passenger")
     public ResponseEntity<PassengerResponse> createPassenger(
-            @RequestBody PassengerRequest passengerRequest) throws ValidateException, EmailAlreadyExistException, PhoneAlreadyExistException {
+           @Valid @RequestBody PassengerRequest passengerRequest) throws EmailAlreadyExistException, PhoneAlreadyExistException {
         return passengerService.createPassenger(passengerRequest);
     }
 
@@ -38,7 +39,7 @@ public class PassengerController {
         return passengerService.deletePassenger(id);
     }
     @PutMapping("/{id}/update")
-    public ResponseEntity<PassengerResponse> updatePassenger( @RequestBody PassengerRequest passengerRequest, @PathVariable Long id) throws PassengerNotFoundException, ValidateException {
+    public ResponseEntity<PassengerResponse> updatePassenger( @Valid @RequestBody PassengerRequest passengerRequest, @PathVariable Long id) throws PassengerNotFoundException {
         return passengerService.updatePassenger(id,passengerRequest);
     }
 

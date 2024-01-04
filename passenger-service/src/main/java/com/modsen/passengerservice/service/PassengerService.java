@@ -6,8 +6,6 @@ import com.modsen.passengerservice.repository.PassengerRepository;
 import com.modsen.passengerservice.dto.request.PassengerRequest;
 import com.modsen.passengerservice.dto.response.PassengerListResponse;
 import com.modsen.passengerservice.dto.response.PassengerResponse;
-import com.modsen.passengerservice.validation.ValidationResult;
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -57,11 +55,7 @@ public class PassengerService {
     }
 
 
-    public ResponseEntity<PassengerResponse> createPassenger(PassengerRequest passengerRequest) throws ValidateException, EmailAlreadyExistException, PhoneAlreadyExistException {
-        ValidationResult validationResult = validatePassengerRequest(passengerRequest);
-        if (!validationResult.isValid()) {
-            throw new ValidateException(validationResult.getErrors());
-        }
+    public ResponseEntity<PassengerResponse> createPassenger(PassengerRequest passengerRequest) throws  EmailAlreadyExistException, PhoneAlreadyExistException {
         checkEmailExist(passengerRequest.getEmail());
         checkPhoneExist(passengerRequest.getPhone());
 
@@ -72,12 +66,7 @@ public class PassengerService {
     }
 
     public ResponseEntity<PassengerResponse> updatePassenger(Long id, PassengerRequest passengerRequest)
-            throws PassengerNotFoundException, ValidateException {
-        ValidationResult validationResult = validatePassengerRequest(passengerRequest);
-        if (!validationResult.isValid()) {
-            throw new ValidateException(validationResult.getErrors());
-        }
-
+            throws PassengerNotFoundException{
         Optional<Passenger> opt_passenger = passengerRepository.findById(id);
         if (opt_passenger.isPresent()) {
             Passenger passenger = fromRequestToEntity(passengerRequest);
@@ -99,15 +88,6 @@ public class PassengerService {
             throw new PassengerNotFoundException("Passenger with id '"+id+"' no found");
     }
 
-    private ValidationResult validatePassengerRequest(PassengerRequest passengerRequest) {
-        Set<ConstraintViolation<PassengerRequest>> violations = validator.validate(passengerRequest);
-        Map<String, String> errorMap = violations.stream()
-                .collect(Collectors.toMap(
-                        violation -> violation.getPropertyPath().toString(),
-                        ConstraintViolation::getMessage
-                ));
-        return new ValidationResult(errorMap);
-    }
     public void checkEmailExist(String email) throws EmailAlreadyExistException {
         Optional<Passenger> opt_passenger = passengerRepository.findByEmail(email);
         if(opt_passenger.isPresent()){
