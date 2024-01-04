@@ -10,6 +10,7 @@ public class PassengerRating {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long passenger_id;
+    @Column(name = "passenger_id")
+    private Long passenger;
     private double rate;
 }

@@ -7,5 +7,6 @@ import lombok.Setter;
 @Setter
 public class PassengerResponse {
     private Long id;
+    private Long passenger;
     private double rate;
 }

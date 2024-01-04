@@ -20,7 +20,7 @@ public class PassengerRatingService {
     private final PassengerMapper passengerMapper;
 
     public ResponseEntity<PassengerResponse> getPassengerRecordById(Long passengerId) throws PassengerRatingNotFoundException {
-        Optional<PassengerRating> opt_passengerRating = passengerRatingRepository.findByPassenger_id(passengerId);
+        Optional<PassengerRating> opt_passengerRating = passengerRatingRepository.findPassengerRatingByPassenger(                                                                                                       passengerId);
         if (opt_passengerRating.isPresent()) {
             return new ResponseEntity<>(passengerMapper.fromEntityToResponse(opt_passengerRating.get()), HttpStatus.OK);
         } else
@@ -30,21 +30,21 @@ public class PassengerRatingService {
     public HttpStatus createPassenger(Long passengerId) throws PassengelAlreadyExistException {
         checkPassengerById(passengerId);
         PassengerRating passengerRating = new PassengerRating();
-        passengerRating.setPassenger_id(passengerId);
+        passengerRating.setPassenger(passengerId);
         passengerRating.setRate(5.0);
         passengerRatingRepository.save(passengerRating);
         return HttpStatus.CREATED;
     }
 
     public void checkPassengerById(Long passenger_id) throws PassengelAlreadyExistException {
-        Optional<PassengerRating> opt_passenger = passengerRatingRepository.findByPassenger_id(passenger_id);
-        if (!opt_passenger.isPresent()) {
+        Optional<PassengerRating> opt_passenger = passengerRatingRepository.findPassengerRatingByPassenger(passenger_id);
+        if (opt_passenger.isPresent()) {
             throw new PassengelAlreadyExistException("Passenger record with passenger id '" + passenger_id + "' already exist");
         }
     }
 
     public ResponseEntity<PassengerResponse> updatePassengerRating(Long passenger_id, double rate) throws PassengerRatingNotFoundException {
-        Optional<PassengerRating> opt_passenger = passengerRatingRepository.findByPassenger_id(passenger_id);
+        Optional<PassengerRating> opt_passenger = passengerRatingRepository.findPassengerRatingByPassenger(passenger_id);
         if (opt_passenger.isPresent()) {
             double newRate = (opt_passenger.get().getRate() + rate) / 2;
             opt_passenger.get().setRate(newRate);
@@ -55,7 +55,7 @@ public class PassengerRatingService {
     }
 
     public HttpStatus deletePassengerRecord(Long passengerId) throws PassengerRatingNotFoundException {
-        Optional<PassengerRating> opt_passenger = passengerRatingRepository.findByPassenger_id(passengerId);
+        Optional<PassengerRating> opt_passenger = passengerRatingRepository.findPassengerRatingByPassenger(passengerId);
         if(opt_passenger.isPresent()){
             passengerRatingRepository.delete(opt_passenger.get());
             return HttpStatus.OK;

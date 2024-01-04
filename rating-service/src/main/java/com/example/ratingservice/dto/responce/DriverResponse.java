@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DriverResponse {
-    private Long driver_id;
+    private Long driver;
     private double rate;
 
 }

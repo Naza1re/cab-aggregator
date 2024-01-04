@@ -10,7 +10,8 @@ public class DriverRating {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long driver_id;
+    @Column(name = "driver_id")
+    private Long driver;
     private double rate;
 
 

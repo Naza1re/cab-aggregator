@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface DriverRatingRepository extends JpaRepository<DriverRating,Long> {
-    Optional<DriverRating> findByDriver_id(Long driver_id);
+    Optional<DriverRating> findDriverRatingByDriver(Long driver);
 }
