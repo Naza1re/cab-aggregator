@@ -61,7 +61,11 @@ public class PassengerService {
     }
 
     public ResponseEntity<PassengerResponse> updatePassenger(Long id, PassengerRequest passengerRequest)
-            throws PassengerNotFoundException{
+            throws PassengerNotFoundException, EmailAlreadyExistException, PhoneAlreadyExistException {
+
+        preUpdateEmailCheck(id,passengerRequest);
+        preUpdatePhoneCheck(id,passengerRequest);
+
         Optional<Passenger> opt_passenger = passengerRepository.findById(id);
         if (opt_passenger.isPresent()) {
             Passenger passenger = fromRequestToEntity(passengerRequest);
@@ -81,6 +85,27 @@ public class PassengerService {
         }
         else
             throw new PassengerNotFoundException("Passenger with id '"+id+"' no found");
+    }
+
+    public void preUpdateEmailCheck(Long passenger_id,PassengerRequest passengerRequest) throws EmailAlreadyExistException, PassengerNotFoundException {
+        Optional<Passenger> opt_passenger = passengerRepository.findById(passenger_id);
+        if(opt_passenger.isPresent()){
+            if(!opt_passenger.get().getEmail().equals(passengerRequest.getEmail())){
+                checkEmailExist(passengerRequest.getEmail());
+            }
+        }
+        else
+            throw new PassengerNotFoundException("Passenger with id '"+passenger_id+"' not found");
+    }
+    public void preUpdatePhoneCheck(Long passenger_id,PassengerRequest passengerRequest) throws PassengerNotFoundException, PhoneAlreadyExistException {
+        Optional<Passenger> opt_passenger = passengerRepository.findById(passenger_id);
+        if(opt_passenger.isPresent()){
+            if(!opt_passenger.get().getPhone().equals(passengerRequest.getPhone())){
+                checkPhoneExist(passengerRequest.getPhone());
+            }
+        }
+        else
+            throw new PassengerNotFoundException("Passenger with id '"+passenger_id+"' not found");
     }
 
     public void checkEmailExist(String email) throws EmailAlreadyExistException {

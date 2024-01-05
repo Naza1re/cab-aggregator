@@ -45,7 +45,7 @@ public class PassengerController {
     @PutMapping("/{id}/update")
     public ResponseEntity<PassengerResponse> updatePassenger(
             @Valid @RequestBody PassengerRequest passengerRequest,
-            @PathVariable Long id) throws PassengerNotFoundException {
+            @PathVariable Long id) throws PassengerNotFoundException, PhoneAlreadyExistException, EmailAlreadyExistException {
         return passengerService.updatePassenger(id,passengerRequest);
     }
 
