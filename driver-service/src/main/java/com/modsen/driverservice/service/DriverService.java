@@ -49,10 +49,11 @@ public class DriverService {
         return new ResponseEntity<>(new DriverListResponse(driverResponseList),HttpStatus.OK);
     }
 
+
     public ResponseEntity<DriverResponse> updateDriver(Long id, DriverRequest driverRequest) throws DriverNotFoundException, EmailAlreadyExistException, PhoneAlreadyExistException {
 
-        checkEmailExist(driverRequest.getEmail());
-        checkPhoneExist(driverRequest.getPhone());
+        preUpdateEmailCheck(id,driverRequest);
+        preUpdatePhoneCheck(id,driverRequest);
 
         Optional<Driver> opt_driver = driverRepository.findById(id);
         if (opt_driver.isPresent()) {
@@ -84,6 +85,26 @@ public class DriverService {
         }
         else
             throw new DriverNotFoundException("Driver with id '"+id+"' not found");
+    }
+    public void preUpdateEmailCheck(Long driver_id,DriverRequest driverRequest) throws EmailAlreadyExistException, DriverNotFoundException {
+        Optional<Driver> opt_driver = driverRepository.findById(driver_id);
+        if(opt_driver.isPresent()){
+            if(!opt_driver.get().getEmail().equals(driverRequest.getEmail())){
+                checkEmailExist(driverRequest.getEmail());
+            }
+        }
+        else
+            throw new DriverNotFoundException("Driver with id '"+driver_id+"' not found");
+    }
+    public void preUpdatePhoneCheck(Long driver_id,DriverRequest driverRequest) throws DriverNotFoundException, PhoneAlreadyExistException {
+        Optional<Driver> opt_driver = driverRepository.findById(driver_id);
+        if(opt_driver.isPresent()){
+            if(!opt_driver.get().getPhone().equals(driverRequest.getPhone())){
+                checkPhoneExist(driverRequest.getPhone());
+            }
+        }
+        else
+            throw new DriverNotFoundException("Driver with id '"+driver_id+"' not found");
     }
 
     public void checkEmailExist(String email) throws EmailAlreadyExistException {
