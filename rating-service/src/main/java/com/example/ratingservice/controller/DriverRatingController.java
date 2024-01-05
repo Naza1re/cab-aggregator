@@ -1,6 +1,6 @@
 package com.example.ratingservice.controller;
 
-import com.example.ratingservice.dto.request.DriverRequest;
+import com.example.ratingservice.dto.request.Request;
 import com.example.ratingservice.dto.responce.DriverResponse;
 import com.example.ratingservice.exception.DriverAlreadyExistException;
 import com.example.ratingservice.exception.DriverRatingNotFoundException;
@@ -30,7 +30,7 @@ public class DriverRatingController {
     @PutMapping("/{driver_id}/update-driver-rate")
     public ResponseEntity<DriverResponse> updateDriverRating(
            @Valid @PathVariable Long driver_id,
-            @RequestBody DriverRequest driverRequest) throws DriverRatingNotFoundException {
+            @RequestBody Request driverRequest) throws DriverRatingNotFoundException {
         return driverRatingService.updateDriverRate(driver_id,driverRequest.getRate());
     }
     @DeleteMapping("/{driver_id}")

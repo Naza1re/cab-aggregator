@@ -1,6 +1,6 @@
 package com.example.ratingservice.mapper;
 
-import com.example.ratingservice.dto.request.DriverRequest;
+import com.example.ratingservice.dto.request.Request;
 import com.example.ratingservice.dto.responce.DriverResponse;
 import com.example.ratingservice.model.DriverRating;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ public class DriverMapper {
     public DriverResponse fromEntityToResponse(DriverRating driverRating){
         return modelMapper.map(driverRating,DriverResponse.class);
     }
-    public DriverRating fromRequestToEntity(DriverRequest driverRequest){
+    public DriverRating fromRequestToEntity(Request driverRequest){
         return modelMapper.map(driverRequest,DriverRating.class);
     }
 }

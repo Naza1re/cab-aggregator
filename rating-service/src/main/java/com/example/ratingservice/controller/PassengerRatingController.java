@@ -1,6 +1,6 @@
 package com.example.ratingservice.controller;
 
-import com.example.ratingservice.dto.request.PassengerRequest;
+import com.example.ratingservice.dto.request.Request;
 import com.example.ratingservice.dto.responce.PassengerResponse;
 import com.example.ratingservice.exception.PassengelAlreadyExistException;
 import com.example.ratingservice.exception.PassengerRatingNotFoundException;
@@ -27,7 +27,7 @@ public class PassengerRatingController {
     }
     @PutMapping("/{passenger_id}/update-passenger-rate")
     public ResponseEntity<PassengerResponse> updatePassengerRate(
-            @Valid @RequestBody PassengerRequest passengerRequest,
+            @Valid @RequestBody Request passengerRequest,
             @PathVariable Long passenger_id) throws PassengerRatingNotFoundException {
         return passengerRatingService.updatePassengerRating(passenger_id,passengerRequest.getRate());
     }
