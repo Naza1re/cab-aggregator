@@ -5,6 +5,7 @@ import com.example.ratingservice.dto.responce.DriverResponse;
 import com.example.ratingservice.exception.DriverAlreadyExistException;
 import com.example.ratingservice.exception.DriverRatingNotFoundException;
 import com.example.ratingservice.service.DriverRatingService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,9 +27,9 @@ public class DriverRatingController {
         return driverRatingService.createDriver(driver_id);
     }
 
-    @PutMapping("/{driver_id}/update-driver-rating")
+    @PutMapping("/{driver_id}/update-driver-rate")
     public ResponseEntity<DriverResponse> updateDriverRating(
-            @PathVariable Long driver_id,
+           @Valid @PathVariable Long driver_id,
             @RequestBody DriverRequest driverRequest) throws DriverRatingNotFoundException {
         return driverRatingService.updateDriverRate(driver_id,driverRequest.getRate());
     }

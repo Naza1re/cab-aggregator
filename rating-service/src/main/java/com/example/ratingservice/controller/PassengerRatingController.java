@@ -5,6 +5,7 @@ import com.example.ratingservice.dto.responce.PassengerResponse;
 import com.example.ratingservice.exception.PassengelAlreadyExistException;
 import com.example.ratingservice.exception.PassengerRatingNotFoundException;
 import com.example.ratingservice.service.PassengerRatingService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,13 +21,13 @@ public class PassengerRatingController {
     public ResponseEntity<PassengerResponse> getPassengerRateById(@PathVariable Long passenger_id) throws PassengerRatingNotFoundException {
         return passengerRatingService.getPassengerRecordById(passenger_id);
     }
-    @PostMapping("/{passenger_id}/creating-passenger-rate")
+    @PostMapping("/{passenger_id}/creat-passenger-rate")
     public HttpStatus creatingPassenger(@PathVariable Long passenger_id) throws PassengelAlreadyExistException {
         return passengerRatingService.createPassenger(passenger_id);
     }
     @PutMapping("/{passenger_id}/update-passenger-rate")
     public ResponseEntity<PassengerResponse> updatePassengerRate(
-            @RequestBody PassengerRequest passengerRequest,
+            @Valid @RequestBody PassengerRequest passengerRequest,
             @PathVariable Long passenger_id) throws PassengerRatingNotFoundException {
         return passengerRatingService.updatePassengerRating(passenger_id,passengerRequest.getRate());
     }
