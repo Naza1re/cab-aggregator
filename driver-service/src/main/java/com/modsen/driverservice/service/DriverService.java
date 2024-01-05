@@ -15,20 +15,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
 public class DriverService {
     private final DriverRepository driverRepository;
     private final ModelMapper modelMapper;
-    private final Validator validator;
 
     public DriverResponse fromEntityToResponse(Driver driver){
         return modelMapper.map(driver, DriverResponse.class);
@@ -37,14 +32,13 @@ public class DriverService {
         return modelMapper.map(driverRequest,Driver.class);
     }
 
-
     public ResponseEntity<DriverResponse> getDriverById(Long id) throws DriverNotFoundException {
         Optional<Driver> opt_driver = driverRepository.findById(id);
-        if(opt_driver.isPresent()){
+        if (opt_driver.isPresent()) {
             return new ResponseEntity<>(fromEntityToResponse(opt_driver.get()), HttpStatus.OK);
         }
         else
-            throw new DriverNotFoundException("driver with id '"+id+"' not found");
+            throw new DriverNotFoundException("Driver with id '"+id+"' not found");
     }
 
     public ResponseEntity<DriverListResponse> getListOfDrivers() {
@@ -56,10 +50,12 @@ public class DriverService {
     }
 
     public ResponseEntity<DriverResponse> updateDriver(Long id, DriverRequest driverRequest) throws DriverNotFoundException, EmailAlreadyExistException, PhoneAlreadyExistException {
+
         checkEmailExist(driverRequest.getEmail());
         checkPhoneExist(driverRequest.getPhone());
+
         Optional<Driver> opt_driver = driverRepository.findById(id);
-        if(opt_driver.isPresent()){
+        if (opt_driver.isPresent()) {
             Driver driver = fromRequestToEntity(driverRequest);
             driver.setId(id);
             return new ResponseEntity<>(fromEntityToResponse(driverRepository.save(driver)),HttpStatus.OK);
@@ -82,7 +78,7 @@ public class DriverService {
 
     public HttpStatus deleteDriver(Long id) throws DriverNotFoundException {
         Optional<Driver> opt_driver = driverRepository.findById(id);
-        if(opt_driver.isPresent()){
+        if (opt_driver.isPresent()) {
             driverRepository.delete(opt_driver.get());
             return HttpStatus.OK;
         }
@@ -92,17 +88,16 @@ public class DriverService {
 
     public void checkEmailExist(String email) throws EmailAlreadyExistException {
         Optional<Driver> opt_driver = driverRepository.findByEmail(email);
-        if(opt_driver.isPresent()){
-            throw new EmailAlreadyExistException("driver with email '"+email+"' already exist");
+        if (opt_driver.isPresent()) {
+            throw new EmailAlreadyExistException("Driver with email '"+email+"' already exist");
         }
     }
-    public void checkPhoneExist(String email) throws PhoneAlreadyExistException {
-        Optional<Driver> opt_driver = driverRepository.findByEmail(email);
-        if(opt_driver.isPresent()){
-            throw new PhoneAlreadyExistException("driver with email '"+email+"' already exist");
+    public void checkPhoneExist(String phone) throws PhoneAlreadyExistException {
+        Optional<Driver> opt_driver = driverRepository.findByPhone(phone);
+        if (opt_driver.isPresent()) {
+            throw new PhoneAlreadyExistException("Driver with phone '"+phone+"' already exist");
         }
     }
-
 
     public ResponseEntity<DriverListResponse> getAvailableDrivers() {
         List<Driver> listOfAvailableDrivers = driverRepository.getAllByAvailable(true);
@@ -112,7 +107,6 @@ public class DriverService {
                 .toList();
         return new ResponseEntity<>(new DriverListResponse(listOfAvailable),HttpStatus.OK);
     }
-
 
     public ResponseEntity<Page<DriverResponse>> getPaginationList(Integer offset, Integer limit) {
         Pageable pageable = PageRequest.of(offset, limit);
@@ -138,7 +132,7 @@ public class DriverService {
 
     public ResponseEntity<DriverResponse> startRideWithDriverId(Long driverId) throws DriverNotFoundException {
         Optional<Driver> opt_driver = driverRepository.findById(driverId);
-        if(opt_driver.isPresent()){
+        if (opt_driver.isPresent()) {
             opt_driver.get().setAvailable(false);
             driverRepository.save(opt_driver.get());
             return new ResponseEntity<>(fromEntityToResponse(opt_driver.get()),HttpStatus.OK);
@@ -149,7 +143,7 @@ public class DriverService {
 
     public ResponseEntity<DriverResponse> endRide(Long driverId) throws DriverNotFoundException {
         Optional<Driver> opt_driver = driverRepository.findById(driverId);
-        if(opt_driver.isPresent()){
+        if (opt_driver.isPresent()) {
             opt_driver.get().setAvailable(true);
             driverRepository.save(opt_driver.get());
             return new ResponseEntity<>(fromEntityToResponse(opt_driver.get()),HttpStatus.OK);
@@ -160,7 +154,7 @@ public class DriverService {
 
     public HttpStatus startWorkingDay(Long id) throws DriverNotFoundException {
         Optional<Driver> opt_driver = driverRepository.findById(id);
-        if(opt_driver.isPresent()){
+        if (opt_driver.isPresent()) {
             opt_driver.get().setAvailable(true);
             driverRepository.save(opt_driver.get());
             return HttpStatus.OK;
@@ -168,9 +162,10 @@ public class DriverService {
         else
             throw new DriverNotFoundException("Driver with id '"+id+"' not found");
     }
+
     public HttpStatus endWorkingDay(Long id) throws DriverNotFoundException {
         Optional<Driver> opt_driver = driverRepository.findById(id);
-        if(opt_driver.isPresent()){
+        if (opt_driver.isPresent()) {
             opt_driver.get().setAvailable(false);
             driverRepository.save(opt_driver.get());
             return HttpStatus.OK;
@@ -181,7 +176,7 @@ public class DriverService {
 
     public ResponseEntity<DriverResponse> getDriverByCarNumber(String carNumber) throws DriverNotFoundException {
         Optional<Driver> opt_driver = driverRepository.findByNumber(carNumber);
-        if(opt_driver.isPresent()){
+        if (opt_driver.isPresent()) {
             return new ResponseEntity<>(fromEntityToResponse(opt_driver.get()),HttpStatus.OK);
         }
         else
