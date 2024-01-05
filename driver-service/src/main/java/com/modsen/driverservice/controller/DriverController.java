@@ -5,6 +5,7 @@ import com.modsen.driverservice.dto.response.DriverListResponse;
 import com.modsen.driverservice.dto.response.DriverResponse;
 import com.modsen.driverservice.exception.*;
 import com.modsen.driverservice.service.DriverService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,7 @@ public class DriverController {
     @PutMapping("/{id}/update")
     public ResponseEntity<DriverResponse> updateDriver(
             @PathVariable Long id,
-            @RequestBody DriverRequest driverRequest) throws DriverNotFoundException, ValidationException, PhoneAlreadyExistException, EmailAlreadyExistException {
+            @Valid @RequestBody DriverRequest driverRequest) throws DriverNotFoundException, PhoneAlreadyExistException, EmailAlreadyExistException {
         return driverService.updateDriver(id,driverRequest);
     }
     @DeleteMapping("/{id}/delete")
@@ -41,7 +42,7 @@ public class DriverController {
     }
     @PostMapping("/create-driver")
     public ResponseEntity<DriverResponse> createDriver(
-            @RequestBody DriverRequest driverRequest) throws ValidationException, EmailAlreadyExistException, PhoneAlreadyExistException {
+            @Valid @RequestBody DriverRequest driverRequest) throws  EmailAlreadyExistException, PhoneAlreadyExistException {
         return driverService.createDriver(driverRequest);
     }
 

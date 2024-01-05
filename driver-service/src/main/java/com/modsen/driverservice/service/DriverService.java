@@ -6,8 +6,6 @@ import com.modsen.driverservice.dto.response.DriverResponse;
 import com.modsen.driverservice.exception.*;
 import com.modsen.driverservice.model.Driver;
 import com.modsen.driverservice.repository.DriverRepository;
-import com.modsen.driverservice.validation.ValidationResult;
-
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -17,10 +15,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -59,11 +55,7 @@ public class DriverService {
         return new ResponseEntity<>(new DriverListResponse(driverResponseList),HttpStatus.OK);
     }
 
-    public ResponseEntity<DriverResponse> updateDriver(Long id, DriverRequest driverRequest) throws DriverNotFoundException, ValidationException, EmailAlreadyExistException, PhoneAlreadyExistException {
-        ValidationResult validationResult = validateDriverRequest(driverRequest);
-        if (!validationResult.isValid()) {
-            throw new ValidationException(validationResult.getErrors());
-        }
+    public ResponseEntity<DriverResponse> updateDriver(Long id, DriverRequest driverRequest) throws DriverNotFoundException, EmailAlreadyExistException, PhoneAlreadyExistException {
         checkEmailExist(driverRequest.getEmail());
         checkPhoneExist(driverRequest.getPhone());
         Optional<Driver> opt_driver = driverRepository.findById(id);
@@ -77,11 +69,8 @@ public class DriverService {
 
     }
 
-    public ResponseEntity<DriverResponse> createDriver(DriverRequest driverRequest) throws ValidationException, EmailAlreadyExistException, PhoneAlreadyExistException {
-        ValidationResult validationResult = validateDriverRequest(driverRequest);
-        if (!validationResult.isValid()) {
-            throw new ValidationException(validationResult.getErrors());
-        }
+    public ResponseEntity<DriverResponse> createDriver(DriverRequest driverRequest) throws EmailAlreadyExistException, PhoneAlreadyExistException {
+
         checkEmailExist(driverRequest.getEmail());
         checkPhoneExist(driverRequest.getPhone());
 
@@ -99,15 +88,6 @@ public class DriverService {
         }
         else
             throw new DriverNotFoundException("Driver with id '"+id+"' not found");
-    }
-    private ValidationResult validateDriverRequest(DriverRequest driverRequest) {
-        Set<ConstraintViolation<DriverRequest>> violations = validator.validate(driverRequest);
-        Map<String, String> errorMap = violations.stream()
-                .collect(Collectors.toMap(
-                        violation -> violation.getPropertyPath().toString(),
-                        ConstraintViolation::getMessage
-                ));
-        return new ValidationResult(errorMap);
     }
 
     public void checkEmailExist(String email) throws EmailAlreadyExistException {
