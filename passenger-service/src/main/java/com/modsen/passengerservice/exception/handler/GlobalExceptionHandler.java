@@ -22,28 +22,34 @@ public class GlobalExceptionHandler {
         String errorMessage = ex.getMessage();
         return new ResponseEntity<>(new AppError(errorMessage), HttpStatus.NOT_FOUND);
     }
+
     @ExceptionHandler(PhoneAlreadyExistException.class)
     public ResponseEntity<AppError> handlePhoneAlreadyExistException(
             PhoneAlreadyExistException ex){
         String errorMessage = ex.getMessage();
         return new ResponseEntity<>(new AppError(errorMessage),HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(EmailAlreadyExistException.class)
     public ResponseEntity<AppError> handleEmailAlreadyExistException(
             EmailAlreadyExistException ex){
         String errorMessage = ex.getMessage();
         return new ResponseEntity<>(new AppError(errorMessage),HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(SortTypeException.class)
     public ResponseEntity<AppError> handleSortTypeException(
             SortTypeException ex){
         String errorMessage = ex.getMessage();
         return new ResponseEntity<>(new AppError(errorMessage),HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(
             MethodArgumentNotValidException ex) {
+
         Map<String, String> errors = new HashMap<>();
+
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();

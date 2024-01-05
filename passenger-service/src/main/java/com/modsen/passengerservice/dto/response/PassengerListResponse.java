@@ -11,7 +11,6 @@ public class PassengerListResponse {
 
     private List<PassengerResponse> listOfPassengers;
 
-
     public PassengerListResponse(List<PassengerResponse> sortedPassengers) {
         this.listOfPassengers=sortedPassengers;
     }
