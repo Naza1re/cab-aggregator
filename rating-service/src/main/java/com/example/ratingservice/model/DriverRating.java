@@ -13,6 +13,4 @@ public class DriverRating {
     @Column(name = "driver_id")
     private Long driver;
     private double rate;
-
-
 }
