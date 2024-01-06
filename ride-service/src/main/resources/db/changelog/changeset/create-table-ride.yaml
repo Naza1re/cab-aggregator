@@ -1,60 +1,41 @@
 databaseChangeLog:
   - changeSet:
-      id: create-ride
-      author: Nazar
+      id: 1
+      author: your_name
       changes:
         - createTable:
             tableName: ride
             columns:
               - column:
                   name: id
-                  type: bigint
+                  type: BIGINT
                   autoIncrement: true
                   constraints:
                     primaryKey: true
-                    nullable: false
               - column:
                   name: driver_id
-                  type: bigint
-                  constraints:
-                    nullable: true
+                  type: BIGINT
               - column:
                   name: passenger_id
-                  type: bigint
-                  constraints:
-                    nullable: true
+                  type: BIGINT
               - column:
-                  name: pickUpAddress
-                  type: varchar(255)
-                  constraints:
-                    nullable: true
+                  name: pick_up_address
+                  type: VARCHAR(255)
               - column:
-                  name: dropOffAddress
-                  type: varchar(255)
-                  constraints:
-                    nullable: true
+                  name: drop_off_address
+                  type: VARCHAR(255)
               - column:
-                  name: startDate
-                  type: date
-                  constraints:
-                    nullable: true
+                  name: start_date
+                  type: DATE
               - column:
-                  name: endDate
-                  type: date
-                  constraints:
-                    nullable: true
+                  name: end_date
+                  type: DATE
               - column:
                   name: price
-                  type: double
-                  constraints:
-                    nullable: true
+                  type: DOUBLE
               - column:
-                  name: isActive
-                  type: boolean
-                  constraints:
-                    nullable: true
+                  name: is_active
+                  type: BOOLEAN
               - column:
                   name: instructions
-                  type: varchar(255)
-                  constraints:
-                    nullable: true
+                  type: VARCHAR(255)
