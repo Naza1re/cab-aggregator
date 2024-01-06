@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
-      id: 1
-      author: your_name
+      id: create table ride
+      author: Nazar
       changes:
         - createTable:
             tableName: ride

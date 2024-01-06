@@ -1,9 +1,6 @@
 package com.example.rideservice.dto.request;
 
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,9 +18,9 @@ public class RideRequest {
     @NotBlank(message = "Drop off  address cannot be blank")
     private String dropOffAddress;
     @NotNull(message = "Price cannot be null")
-    @DecimalMax(value = "10.0", message = "Price cannot exceed 10 rubles - это дохера")
+    @DecimalMax(value = "10.0", message = "Price cannot exceed 10 rubles - its big count of money , pls make price less")
     private double price;
-
+    @Size(max = 50, message = "Instructions cannot be longer than 50 characters")
     private String instructions;
 
 }

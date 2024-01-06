@@ -22,8 +22,6 @@ public class RideService {
     private final RideRepository rideRepository;
     private final ModelMapper modelMapper;
 
-
-
     public Ride fromRequestToEntity(RideRequest request){
         return modelMapper.map(request,Ride.class);
     }
@@ -42,12 +40,11 @@ public class RideService {
         else
             throw new RideNotFoundException("Ride with id '"+ride_id+"' not found");
 
-
     }
 
     public ResponseEntity<RideResponse> getRideById(Long id) throws RideNotFoundException {
         Optional<Ride> opt_ride = rideRepository.findById(id);
-        if(opt_ride.isPresent()){
+        if (opt_ride.isPresent()) {
             return new ResponseEntity<>(fromEntityToResponse(opt_ride.get()),HttpStatus.OK);
         }
         else
@@ -56,7 +53,7 @@ public class RideService {
 
    public ResponseEntity<RideResponse> endRide(Long rideId) throws RideNotFoundException {
         Optional<Ride> opt_ride = rideRepository.findById(rideId);
-        if(opt_ride.isPresent()){
+        if (opt_ride.isPresent()) {
             opt_ride.get().setEndDate(LocalDate.now());
             opt_ride.get().setActive(false);
             rideRepository.save(opt_ride.get());
