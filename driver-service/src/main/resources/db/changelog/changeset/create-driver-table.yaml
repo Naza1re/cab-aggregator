@@ -2,6 +2,12 @@ databaseChangeLog:
   - changeSet:
       id: create-driver
       author: Nazar
+      preConditions:
+        - onFail: MARK_RAN
+          or:
+            - not:
+                tableExists:
+                  tableName: drivers
       changes:
         - createTable:
             tableName: drivers
@@ -38,4 +44,7 @@ databaseChangeLog:
                   type: boolean
                   constraints:
                     nullable: false
+      rollback:
+        - dropTable:
+            tableName: drivers
 

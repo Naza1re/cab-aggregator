@@ -33,7 +33,7 @@ public class DriverController {
     @PutMapping("/{id}/update")
     public ResponseEntity<DriverResponse> updateDriver(
             @PathVariable Long id,
-            @Valid @RequestBody DriverRequest driverRequest) throws DriverNotFoundException, PhoneAlreadyExistException, EmailAlreadyExistException {
+            @Valid @RequestBody DriverRequest driverRequest) throws DriverNotFoundException, PhoneAlreadyExistException, EmailAlreadyExistException, CarNumberAlreadyExistException {
         return driverService.updateDriver(id,driverRequest);
     }
 
@@ -45,7 +45,7 @@ public class DriverController {
 
     @PostMapping("/create-driver")
     public ResponseEntity<DriverResponse> createDriver(
-            @Valid @RequestBody DriverRequest driverRequest) throws  EmailAlreadyExistException, PhoneAlreadyExistException {
+            @Valid @RequestBody DriverRequest driverRequest) throws EmailAlreadyExistException, PhoneAlreadyExistException, CarNumberAlreadyExistException {
         return driverService.createDriver(driverRequest);
     }
 

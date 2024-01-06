@@ -1,10 +1,7 @@
 package com.modsen.driverservice.exception.handler;
 
+import com.modsen.driverservice.exception.*;
 import com.modsen.driverservice.exception.AppError.AppError;
-import com.modsen.driverservice.exception.DriverNotFoundException;
-import com.modsen.driverservice.exception.EmailAlreadyExistException;
-import com.modsen.driverservice.exception.PhoneAlreadyExistException;
-import com.modsen.driverservice.exception.SortTypeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -42,6 +39,13 @@ public class GlobalHandler {
     @ExceptionHandler(PhoneAlreadyExistException.class)
     public ResponseEntity<AppError>  handlePhoneAlreadyExistException(
             PhoneAlreadyExistException ex){
+        String errorMessage = ex.getMessage();
+        return new ResponseEntity<>(new AppError(errorMessage),HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(CarNumberAlreadyExistException.class)
+    public ResponseEntity<AppError>  handleCarNumberAlreadyExistException(
+            CarNumberAlreadyExistException ex){
         String errorMessage = ex.getMessage();
         return new ResponseEntity<>(new AppError(errorMessage),HttpStatus.BAD_REQUEST);
     }

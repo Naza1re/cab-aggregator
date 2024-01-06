@@ -50,10 +50,11 @@ public class DriverService {
     }
 
 
-    public ResponseEntity<DriverResponse> updateDriver(Long id, DriverRequest driverRequest) throws DriverNotFoundException, EmailAlreadyExistException, PhoneAlreadyExistException {
+    public ResponseEntity<DriverResponse> updateDriver(Long id, DriverRequest driverRequest) throws DriverNotFoundException, EmailAlreadyExistException, PhoneAlreadyExistException, CarNumberAlreadyExistException {
 
         preUpdateEmailCheck(id,driverRequest);
         preUpdatePhoneCheck(id,driverRequest);
+        preUpdateCarNumberCheck(id,driverRequest);
 
         Optional<Driver> opt_driver = driverRepository.findById(id);
         if (opt_driver.isPresent()) {
@@ -66,10 +67,11 @@ public class DriverService {
 
     }
 
-    public ResponseEntity<DriverResponse> createDriver(DriverRequest driverRequest) throws EmailAlreadyExistException, PhoneAlreadyExistException {
+    public ResponseEntity<DriverResponse> createDriver(DriverRequest driverRequest) throws EmailAlreadyExistException, PhoneAlreadyExistException, CarNumberAlreadyExistException {
 
         checkEmailExist(driverRequest.getEmail());
         checkPhoneExist(driverRequest.getPhone());
+        checkCarNumberExist(driverRequest.getNumber());
 
         Driver driver = fromRequestToEntity(driverRequest);
         driver.setAvailable(false);
@@ -88,7 +90,7 @@ public class DriverService {
     }
     public void preUpdateEmailCheck(Long driver_id,DriverRequest driverRequest) throws EmailAlreadyExistException, DriverNotFoundException {
         Optional<Driver> opt_driver = driverRepository.findById(driver_id);
-        if(opt_driver.isPresent()){
+        if (opt_driver.isPresent()) {
             if(!opt_driver.get().getEmail().equals(driverRequest.getEmail())){
                 checkEmailExist(driverRequest.getEmail());
             }
@@ -98,13 +100,22 @@ public class DriverService {
     }
     public void preUpdatePhoneCheck(Long driver_id,DriverRequest driverRequest) throws DriverNotFoundException, PhoneAlreadyExistException {
         Optional<Driver> opt_driver = driverRepository.findById(driver_id);
-        if(opt_driver.isPresent()){
+        if (opt_driver.isPresent()) {
             if(!opt_driver.get().getPhone().equals(driverRequest.getPhone())){
                 checkPhoneExist(driverRequest.getPhone());
             }
         }
         else
             throw new DriverNotFoundException("Driver with id '"+driver_id+"' not found");
+    }
+    public void preUpdateCarNumberCheck(Long driver_id,DriverRequest driverRequest) throws CarNumberAlreadyExistException {
+        Optional<Driver> opt_driver = driverRepository.findById(driver_id);
+        if (opt_driver.isPresent()) {
+            if(!opt_driver.get().getNumber().equals(driverRequest.getNumber())){
+                System.out.println(driverRequest.getNumber());
+                checkCarNumberExist(driverRequest.getNumber());
+            }
+        }
     }
 
     public void checkEmailExist(String email) throws EmailAlreadyExistException {
@@ -117,6 +128,13 @@ public class DriverService {
         Optional<Driver> opt_driver = driverRepository.findByPhone(phone);
         if (opt_driver.isPresent()) {
             throw new PhoneAlreadyExistException("Driver with phone '"+phone+"' already exist");
+        }
+    }
+    public void checkCarNumberExist(String carNum) throws CarNumberAlreadyExistException {
+        System.out.println(carNum);
+        Optional<Driver> opt_driver = driverRepository.findByNumber(carNum);
+        if (opt_driver.isPresent()) {
+            throw new CarNumberAlreadyExistException("Car with number '"+carNum+"' already exist");
         }
     }
 
@@ -137,6 +155,7 @@ public class DriverService {
 
         return ResponseEntity.ok(passengerResponsePage);
     }
+
 
     public ResponseEntity<DriverListResponse> getSortedListOfPassengers(String type) throws SortTypeException {
         List<Driver> sortedPassengers = switch (type.toLowerCase()) {

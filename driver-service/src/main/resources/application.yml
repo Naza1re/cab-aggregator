@@ -11,5 +11,4 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto:  none
-server:
-  port: 8081
+
