@@ -1,24 +1,15 @@
 package com.example.rideservice.dto.request;
 
-import java.time.LocalDate;
-
+import lombok.Getter;
+import lombok.Setter;
+@Getter
+@Setter
 public class RideRequest {
-
-    private Long driver_id;
-
-    private Long passenger_id;
-
+    private Long passengerId;
     private String pickUpAddress;
-
-    private String dropOfAddress;
-
-    private LocalDate startDate;
-
-    private LocalDate endDate;
-
+    private String dropOffAddress;
     private double price;
 
-    private boolean isActive;
 
 
 
