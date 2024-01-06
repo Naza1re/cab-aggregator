@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface RideRepository extends JpaRepository<Ride,Long> {
-    List<Ride> getAllByPassenger_id(Long passenger_id);
-    List<Ride> getAllByDriver_id(Long driver_id);
+    List<Ride> getAllByPassengerId(Long passenger_id);
+    List<Ride> getAllByDriverId(Long driver_id);
 }

@@ -12,13 +12,13 @@ public class RideResponse {
 
     private Long id;
 
-    private Long driver_id;
+    private Long driverId;
 
-    private Long passenger_id;
+    private Long passengerId;
 
     private String pickUpAddress;
 
-    private String dropOfAddress;
+    private String dropOffAddress;
 
     private LocalDate startDate;
 

@@ -1,12 +1,12 @@
 package com.example.rideservice.controller;
 
+import com.example.rideservice.dto.request.RideRequest;
 import com.example.rideservice.dto.response.RideListResponse;
 import com.example.rideservice.dto.response.RideResponse;
 import com.example.rideservice.exception.RideNotFoundException;
-import com.example.rideservice.model.Driver;
-import com.example.rideservice.model.Passenger;
 import com.example.rideservice.service.RideService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,23 +15,46 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/rides")
 public class RideController {
     private final RideService rideService;
-
-    @PostMapping("/start-ride")
-    public ResponseEntity<RideResponse> startRide(@RequestBody Driver driver, @RequestBody Passenger passenger){
-        return rideService.startRideWithPassengerAndDriver(passenger,driver);
+    @PutMapping("/{ride_id}/accept-ride-driver/{driver_id}")
+    public ResponseEntity<RideResponse> acceptRideByDriver(
+            @PathVariable Long driver_id,
+            @PathVariable Long ride_id) throws RideNotFoundException {
+        return rideService.acceptRide(ride_id,driver_id);
     }
+
+    @PutMapping("/{ride_id}/cancel-ride-driver/{driver_id}")
+    public HttpStatus cancelRideByDriver(
+            @PathVariable Long driver_id,
+            @PathVariable Long ride_id) throws RideNotFoundException {
+        return rideService.cancelRide(ride_id,driver_id);
+    }
+
+    @PostMapping("/find-ride")
+    public ResponseEntity<RideResponse> findRide(@RequestBody RideRequest rideRequest){
+        return rideService.findRide(rideRequest);
+    }
+
+    @PutMapping("/{ride_id}/start-ride")
+    public ResponseEntity<RideResponse> startRide(
+            @PathVariable Long ride_id) throws RideNotFoundException {
+        return rideService.startRideWithPassengerAndDriver(ride_id);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<RideResponse> getRideById(@PathVariable Long id) throws RideNotFoundException {
         return rideService.getRideById(id);
     }
-    @PutMapping("/end-ride/{ride_Id}")
-    public ResponseEntity<RideResponse> endRide(@PathVariable Long ride_Id) throws RideNotFoundException {
-        return rideService.endRide(ride_Id);
+
+    @PutMapping("/{ride_id}/end-ride")
+    public ResponseEntity<RideResponse> endRide(@PathVariable Long ride_id) throws RideNotFoundException {
+        return rideService.endRide(ride_id);
     }
+
     @GetMapping("/get-passenger-list-of-rides/{passenger_id}")
     public ResponseEntity<RideListResponse> getListOfRidesByPassengerId(@PathVariable Long passenger_id){
         return rideService.getListOfRidesByPassengerId(passenger_id);
     }
+
     @GetMapping("/get-driver-list-of-rides/{driver_id}")
     public ResponseEntity<RideListResponse> getListOfRidesByDriverId(@PathVariable Long driver_id){
         return rideService.getListOfRidesByDriverId(driver_id);
