@@ -5,6 +5,7 @@ import com.example.rideservice.dto.response.RideListResponse;
 import com.example.rideservice.dto.response.RideResponse;
 import com.example.rideservice.exception.RideNotFoundException;
 import com.example.rideservice.service.RideService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class RideController {
     }
 
     @PostMapping("/find-ride")
-    public ResponseEntity<RideResponse> findRide(@RequestBody RideRequest rideRequest){
+    public ResponseEntity<RideResponse> findRide(@Valid @RequestBody RideRequest rideRequest){
         return rideService.findRide(rideRequest);
     }
 
