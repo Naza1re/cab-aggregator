@@ -56,7 +56,7 @@ public class PassengerRatingService {
 
     public HttpStatus deletePassengerRecord(Long passengerId) throws PassengerRatingNotFoundException {
         Optional<PassengerRating> opt_passenger = passengerRatingRepository.findPassengerRatingByPassenger(passengerId);
-        if(opt_passenger.isPresent()){
+        if (opt_passenger.isPresent()) {
             passengerRatingRepository.delete(opt_passenger.get());
             return HttpStatus.OK;
         }

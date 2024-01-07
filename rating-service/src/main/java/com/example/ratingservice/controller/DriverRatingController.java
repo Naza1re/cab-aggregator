@@ -30,9 +30,10 @@ public class DriverRatingController {
     @PutMapping("/{driver_id}/update-driver-rate")
     public ResponseEntity<DriverResponse> updateDriverRating(
            @Valid @PathVariable Long driver_id,
-            @RequestBody Request driverRequest) throws DriverRatingNotFoundException {
+           @RequestBody Request driverRequest) throws DriverRatingNotFoundException {
         return driverRatingService.updateDriverRate(driver_id,driverRequest.getRate());
     }
+
     @DeleteMapping("/{driver_id}")
     public HttpStatus deleteDriver(@PathVariable Long driver_id) throws DriverRatingNotFoundException {
         return driverRatingService.deleteDriverRecord(driver_id);

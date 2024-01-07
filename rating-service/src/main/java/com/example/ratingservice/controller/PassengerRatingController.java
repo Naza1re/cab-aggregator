@@ -21,16 +21,19 @@ public class PassengerRatingController {
     public ResponseEntity<PassengerResponse> getPassengerRateById(@PathVariable Long passenger_id) throws PassengerRatingNotFoundException {
         return passengerRatingService.getPassengerRecordById(passenger_id);
     }
+
     @PostMapping("/{passenger_id}/creat-passenger-rate")
     public HttpStatus creatingPassenger(@PathVariable Long passenger_id) throws PassengelAlreadyExistException {
         return passengerRatingService.createPassenger(passenger_id);
     }
+
     @PutMapping("/{passenger_id}/update-passenger-rate")
     public ResponseEntity<PassengerResponse> updatePassengerRate(
             @Valid @RequestBody Request passengerRequest,
             @PathVariable Long passenger_id) throws PassengerRatingNotFoundException {
         return passengerRatingService.updatePassengerRating(passenger_id,passengerRequest.getRate());
     }
+
     @DeleteMapping("/{passenger_id}")
     public HttpStatus deletePassengerRecord(@PathVariable Long passenger_id) throws PassengerRatingNotFoundException {
         return passengerRatingService.deletePassengerRecord(passenger_id);
