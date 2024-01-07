@@ -1,7 +1,10 @@
 package com.example.ratingservice.controller;
 
 import com.example.ratingservice.dto.request.Request;
+import com.example.ratingservice.dto.responce.DriverListResponse;
+import com.example.ratingservice.dto.responce.PassengerListResponse;
 import com.example.ratingservice.dto.responce.PassengerResponse;
+import com.example.ratingservice.exception.IncorrectIdException;
 import com.example.ratingservice.exception.PassengelAlreadyExistException;
 import com.example.ratingservice.exception.PassengerRatingNotFoundException;
 import com.example.ratingservice.service.PassengerRatingService;
@@ -17,13 +20,18 @@ import org.springframework.web.bind.annotation.*;
 public class PassengerRatingController {
     private final PassengerRatingService passengerRatingService;
 
+    @GetMapping("/list-of-passengers")
+    public ResponseEntity<PassengerListResponse> getListOfPassengers(){
+        return passengerRatingService.getAllPassengersRecords();
+    }
+
     @GetMapping("/{passenger_id}")
     public ResponseEntity<PassengerResponse> getPassengerRateById(@PathVariable Long passenger_id) throws PassengerRatingNotFoundException {
         return passengerRatingService.getPassengerRecordById(passenger_id);
     }
 
     @PostMapping("/{passenger_id}/creat-passenger-rate")
-    public HttpStatus creatingPassenger(@PathVariable Long passenger_id) throws PassengelAlreadyExistException {
+    public ResponseEntity<PassengerResponse> creatingPassenger(@PathVariable Long passenger_id) throws PassengelAlreadyExistException, IncorrectIdException {
         return passengerRatingService.createPassenger(passenger_id);
     }
 

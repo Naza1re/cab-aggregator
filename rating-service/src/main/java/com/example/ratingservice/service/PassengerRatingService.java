@@ -1,6 +1,10 @@
 package com.example.ratingservice.service;
 
+import com.example.ratingservice.dto.responce.DriverListResponse;
+import com.example.ratingservice.dto.responce.DriverResponse;
+import com.example.ratingservice.dto.responce.PassengerListResponse;
 import com.example.ratingservice.dto.responce.PassengerResponse;
+import com.example.ratingservice.exception.IncorrectIdException;
 import com.example.ratingservice.exception.PassengelAlreadyExistException;
 import com.example.ratingservice.exception.PassengerRatingNotFoundException;
 import com.example.ratingservice.mapper.PassengerMapper;
@@ -11,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -27,19 +32,26 @@ public class PassengerRatingService {
             throw new PassengerRatingNotFoundException("Passenger record with passenger id  '" + passengerId + "' not found");
     }
 
-    public HttpStatus createPassenger(Long passengerId) throws PassengelAlreadyExistException {
+    public ResponseEntity<PassengerResponse> createPassenger(Long passengerId) throws PassengelAlreadyExistException, IncorrectIdException {
         checkPassengerById(passengerId);
+        checkCorrectPassengerId(passengerId);
         PassengerRating passengerRating = new PassengerRating();
         passengerRating.setPassenger(passengerId);
         passengerRating.setRate(5.0);
         passengerRatingRepository.save(passengerRating);
-        return HttpStatus.CREATED;
+        return new ResponseEntity<>(passengerMapper.fromEntityToResponse(passengerRating),HttpStatus.CREATED);
     }
 
     public void checkPassengerById(Long passenger_id) throws PassengelAlreadyExistException {
         Optional<PassengerRating> opt_passenger = passengerRatingRepository.findPassengerRatingByPassenger(passenger_id);
         if (opt_passenger.isPresent()) {
             throw new PassengelAlreadyExistException("Passenger record with passenger id '" + passenger_id + "' already exist");
+        }
+    }
+
+    public void checkCorrectPassengerId(Long passenger_id) throws IncorrectIdException {
+        if(passenger_id<=0){
+            throw new IncorrectIdException("Incorrect driver id '"+passenger_id+"'");
         }
     }
 
@@ -62,6 +74,17 @@ public class PassengerRatingService {
         }
         else
             throw new PassengerRatingNotFoundException("Passenger record with passenger id  '" + passengerId+ "' not found");
+    }
+
+    public ResponseEntity<PassengerListResponse> getAllPassengersRecords() {
+
+        List<PassengerResponse> passengerRatings = passengerRatingRepository.findAll()
+                .stream()
+                .map(passengerMapper::fromEntityToResponse)
+                .toList();
+        PassengerListResponse passengerListResponse = new PassengerListResponse(passengerRatings);
+
+        return new ResponseEntity<>(passengerListResponse,HttpStatus.OK);
     }
 }
 

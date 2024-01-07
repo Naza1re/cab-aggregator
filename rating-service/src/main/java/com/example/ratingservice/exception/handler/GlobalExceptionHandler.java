@@ -1,10 +1,7 @@
 package com.example.ratingservice.exception.handler;
 
+import com.example.ratingservice.exception.*;
 import com.example.ratingservice.exception.AppError.AppError;
-import com.example.ratingservice.exception.DriverAlreadyExistException;
-import com.example.ratingservice.exception.DriverRatingNotFoundException;
-import com.example.ratingservice.exception.PassengelAlreadyExistException;
-import com.example.ratingservice.exception.PassengerRatingNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -44,6 +41,13 @@ public class GlobalExceptionHandler {
             PassengerRatingNotFoundException ex){
         String errorMessage = ex.getMessage();
         return new ResponseEntity<>(new AppError(errorMessage), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(IncorrectIdException.class)
+    public ResponseEntity<AppError> handleIncorrectDriverIdException(
+            IncorrectIdException ex){
+        String errorMessage = ex.getMessage();
+        return new ResponseEntity<>(new AppError(errorMessage),HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
