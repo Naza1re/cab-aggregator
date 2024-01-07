@@ -1,7 +1,13 @@
 databaseChangeLog:
   - changeSet:
-      id: create table ride
+      id: create-table-ride
       author: Nazar
+      preConditions:
+        - onFail: MARK_RAN
+          or:
+            - not:
+                tableExists:
+                  tableName: ride
       changes:
         - createTable:
             tableName: ride
@@ -39,3 +45,6 @@ databaseChangeLog:
               - column:
                   name: instructions
                   type: VARCHAR(255)
+      rollback:
+        - dropTable:
+            tableName: ride

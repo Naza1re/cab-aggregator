@@ -10,4 +10,4 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
     show-sql: true
     hibernate:
-      ddl-auto:
+      ddl-auto: none
