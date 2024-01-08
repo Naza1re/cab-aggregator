@@ -6,6 +6,7 @@ import com.modsen.passengerservice.repository.PassengerRepository;
 import com.modsen.passengerservice.dto.request.PassengerRequest;
 import com.modsen.passengerservice.dto.response.PassengerListResponse;
 import com.modsen.passengerservice.dto.response.PassengerResponse;
+import com.modsen.passengerservice.util.Constants;
 import com.modsen.passengerservice.util.Messages;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -13,8 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.util.*;
 
@@ -28,6 +27,7 @@ public class PassengerService {
     public PassengerResponse fromEntityToResponse(Passenger passenger){
         return modelMapper.map(passenger,PassengerResponse.class);
     }
+
     public Passenger fromRequestToEntity(PassengerRequest passengerRequest){
         return modelMapper.map(passengerRequest, Passenger.class);
     }
@@ -64,9 +64,9 @@ public class PassengerService {
         preUpdateEmailCheck(id,passengerRequest);
         preUpdatePhoneCheck(id,passengerRequest);
 
-        Passenger passenger = passengerRepository.findById(id).orElseThrow(()->
-                new PassengerNotFoundException(String.format(Messages.PASSENGER_NOT_FOUND_EXCEPTION,id)));
-            passenger = fromRequestToEntity(passengerRequest);
+        passengerRepository.findById(id)
+                .orElseThrow(()-> new PassengerNotFoundException(String.format(Messages.PASSENGER_NOT_FOUND_EXCEPTION,id)));
+            Passenger passenger = fromRequestToEntity(passengerRequest);
             passenger.setId(id);
             return fromEntityToResponse(passengerRepository.save(passenger));
 
@@ -80,26 +80,23 @@ public class PassengerService {
 
     }
 
-    public void preUpdateEmailCheck(Long passenger_id,PassengerRequest passengerRequest) throws EmailAlreadyExistException, PassengerNotFoundException {
-        Optional<Passenger> listOfPassengers = passengerRepository.findById(passenger_id);
-        if(listOfPassengers.isPresent()){
-            if(!listOfPassengers.get().getEmail().equals(passengerRequest.getEmail())){
-                checkEmailExist(passengerRequest.getEmail());
-            }
-        }
-        else {
-            throw new PassengerNotFoundException(String.format(Messages.PASSENGER_NOT_FOUND_EXCEPTION, passenger_id));
+    public void preUpdateEmailCheck(Long passengerId, PassengerRequest passengerRequest)
+            throws EmailAlreadyExistException, PassengerNotFoundException {
+        Passenger passenger = passengerRepository.findById(passengerId)
+                .orElseThrow(() -> new PassengerNotFoundException(String.format(Messages.PASSENGER_NOT_FOUND_EXCEPTION, passengerId)));
+
+        if (!passenger.getEmail().equals(passengerRequest.getEmail())) {
+            checkEmailExist(passengerRequest.getEmail());
         }
     }
-    public void preUpdatePhoneCheck(Long passenger_id,PassengerRequest passengerRequest) throws PassengerNotFoundException, PhoneAlreadyExistException {
-        Optional<Passenger> opt_passenger = passengerRepository.findById(passenger_id);
-        if(opt_passenger.isPresent()){
-            if(!opt_passenger.get().getPhone().equals(passengerRequest.getPhone())){
-                checkPhoneExist(passengerRequest.getPhone());
-            }
-        }
-        else {
-            throw new PassengerNotFoundException(String.format(Messages.PASSENGER_NOT_FOUND_EXCEPTION,passenger_id));
+
+    public void preUpdatePhoneCheck(Long passengerId, PassengerRequest passengerRequest)
+            throws PassengerNotFoundException, PhoneAlreadyExistException {
+        Passenger passenger = passengerRepository.findById(passengerId)
+                .orElseThrow(() -> new PassengerNotFoundException(String.format(Messages.PASSENGER_NOT_FOUND_EXCEPTION, passengerId)));
+
+        if (!passenger.getPhone().equals(passengerRequest.getPhone())) {
+            checkPhoneExist(passengerRequest.getPhone());
         }
     }
 
@@ -110,6 +107,7 @@ public class PassengerService {
             throw new EmailAlreadyExistException(String.format(Messages.PASSENGER_WITH_EMAIL_ALREADY_EXIST,email));
         }
     }
+
     public void checkPhoneExist(String phone) throws  PhoneAlreadyExistException {
         Optional<Passenger> opt_passenger = passengerRepository.findByPhone(phone);
         if (opt_passenger.isPresent()) {
@@ -119,8 +117,8 @@ public class PassengerService {
 
     public PassengerListResponse getSortedListOfPassengers(String type) throws SortTypeException {
         List<Passenger> sortedPassengers = switch (type.toLowerCase()) {
-            case "name" -> passengerRepository.findAll(Sort.by(Sort.Order.asc("name")));
-            case "surname" -> passengerRepository.findAll(Sort.by(Sort.Order.asc("surname")));
+            case "name" -> passengerRepository.findAll(Sort.by(Sort.Order.asc(Constants.SORT_TYPE_NAME)));
+            case "surname" -> passengerRepository.findAll(Sort.by(Sort.Order.asc(Constants.SORT_TYPE_SURNAME)));
             default -> throw new SortTypeException(String.format(Messages.INVALID_TYPE_OF_SORT));
         };
 
