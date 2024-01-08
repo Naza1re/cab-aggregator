@@ -8,8 +8,6 @@ import com.modsen.passengerservice.service.PassengerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,37 +18,37 @@ public class PassengerController {
     private final PassengerService passengerService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<PassengerResponse> getPassengerById(
+    public PassengerResponse getPassengerById(
             @PathVariable Long id) throws PassengerNotFoundException {
         return passengerService.getPassengerById(id);
     }
 
     @GetMapping("/list")
-    public  ResponseEntity<PassengerListResponse> getAllPassengers(){
+    public PassengerListResponse getAllPassengers(){
         return passengerService.getAllPassengers();
     }
 
     @PostMapping()
-    public ResponseEntity<PassengerResponse> createPassenger(
+    public PassengerResponse createPassenger(
            @Valid @RequestBody PassengerRequest passengerRequest) throws EmailAlreadyExistException, PhoneAlreadyExistException {
         return passengerService.createPassenger(passengerRequest);
     }
 
     @DeleteMapping("/{id}")
-    public HttpStatus deletePassenger(
+    public PassengerResponse deletePassenger(
             @PathVariable Long id) throws PassengerNotFoundException {
         return passengerService.deletePassenger(id);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PassengerResponse> updatePassenger(
+    public PassengerResponse updatePassenger(
             @Valid @RequestBody PassengerRequest passengerRequest,
             @PathVariable Long id) throws PassengerNotFoundException, PhoneAlreadyExistException, EmailAlreadyExistException {
         return passengerService.updatePassenger(id,passengerRequest);
     }
 
     @GetMapping("/page")
-    public ResponseEntity<Page<PassengerResponse>> getSortedListOfPassengers(
+    public Page<PassengerResponse> getSortedListOfPassengers(
             @RequestParam("offset") Integer offset,
             @RequestParam("limit") Integer limit
     ){
@@ -58,7 +56,7 @@ public class PassengerController {
     }
 
     @GetMapping("/sorted-list")
-    public ResponseEntity<PassengerListResponse> SortedListOfPassengers(
+    public PassengerListResponse sortedListOfPassengers(
             @RequestParam String type) throws SortTypeException {
         return passengerService.getSortedListOfPassengers(type);
     }

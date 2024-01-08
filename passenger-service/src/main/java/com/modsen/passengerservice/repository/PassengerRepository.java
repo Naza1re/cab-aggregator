@@ -10,7 +10,8 @@ import java.util.Optional;
 public interface PassengerRepository extends JpaRepository<Passenger,Long> {
 
     Optional<Passenger> findByPhone(String phone);
-    Passenger findByName(String name);
-    Passenger findBySurname(String surname);
+    Optional<Passenger> findByName(String name);
+    Optional<Passenger> findBySurname(String surname);
     Optional<Passenger> findByEmail(String email);
+    boolean existsById(long id);
 }

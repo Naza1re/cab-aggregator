@@ -3,11 +3,13 @@ package com.modsen.passengerservice.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
+
 @Setter
+@Getter
 public class PassengerRequest {
 
     @NotBlank(message = "Name cannot be blank")
