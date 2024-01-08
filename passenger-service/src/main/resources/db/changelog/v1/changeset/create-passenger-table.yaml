@@ -1,13 +1,7 @@
 databaseChangeLog:
   - changeSet:
-      id: create-author
-      author: Nazar
-      preConditions:
-        - onFail: MARK_RAN
-          or:
-          - not:
-          tableExists:
-          tableName: passenger
+      id: create-passenger
+      author: nikita
       changes:
         - createTable:
             tableName: passenger
