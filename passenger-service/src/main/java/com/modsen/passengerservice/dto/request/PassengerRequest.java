@@ -12,19 +12,20 @@ import lombok.Setter;
 @Getter
 public class PassengerRequest {
 
-    @NotBlank(message = "Name cannot be blank")
-    @Size(max = 16, message = "Name cannot be longer than 16 characters")
+    @NotBlank(message = "{name.not.blanked}")
+    @Size(max = 16, message = "{name.max.value}")
     private String name;
 
-    @NotBlank(message = "Surname cannot be blank")
+    @NotBlank(message = "{surname.not.blanked}")
+    @Size(max = 16, message = "{surname.max.value}")
     private String surname;
 
-    @NotBlank(message = "Phone cannot be blank")
-    @Pattern(regexp = "\\d{11}", message = "Phone must be a 11-digit number")
+    @NotBlank(message = "{phone.not.blanked}")
+    @Pattern(regexp = "\\d{11}", message = "{phone.invalid.message}")
     private String phone;
 
-    @NotBlank(message = "Email cannot be blank")
-    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "Invalid email format")
+    @NotBlank(message = "{email.not.blanked}")
+    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "{email.invalid.message}")
     private String email;
 
 }

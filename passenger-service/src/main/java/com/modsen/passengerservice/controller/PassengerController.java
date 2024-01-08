@@ -8,6 +8,7 @@ import com.modsen.passengerservice.service.PassengerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,47 +19,47 @@ public class PassengerController {
     private final PassengerService passengerService;
 
     @GetMapping("/{id}")
-    public PassengerResponse getPassengerById(
+    public ResponseEntity<PassengerResponse> getPassengerById(
             @PathVariable Long id) throws PassengerNotFoundException {
-        return passengerService.getPassengerById(id);
+        return ResponseEntity.ok(passengerService.getPassengerById(id));
     }
 
     @GetMapping("/list")
-    public PassengerListResponse getAllPassengers(){
-        return passengerService.getAllPassengers();
+    public ResponseEntity<PassengerListResponse> getAllPassengers(){
+        return ResponseEntity.ok(passengerService.getAllPassengers());
     }
 
     @PostMapping()
-    public PassengerResponse createPassenger(
+    public ResponseEntity<PassengerResponse> createPassenger(
            @Valid @RequestBody PassengerRequest passengerRequest) throws EmailAlreadyExistException, PhoneAlreadyExistException {
-        return passengerService.createPassenger(passengerRequest);
+        return ResponseEntity.ok(passengerService.createPassenger(passengerRequest));
     }
 
     @DeleteMapping("/{id}")
-    public PassengerResponse deletePassenger(
+    public ResponseEntity<PassengerResponse> deletePassenger(
             @PathVariable Long id) throws PassengerNotFoundException {
-        return passengerService.deletePassenger(id);
+        return ResponseEntity.ok(passengerService.deletePassenger(id));
     }
 
     @PutMapping("/{id}")
-    public PassengerResponse updatePassenger(
+    public ResponseEntity<PassengerResponse> updatePassenger(
             @Valid @RequestBody PassengerRequest passengerRequest,
             @PathVariable Long id) throws PassengerNotFoundException, PhoneAlreadyExistException, EmailAlreadyExistException {
-        return passengerService.updatePassenger(id,passengerRequest);
+        return ResponseEntity.ok(passengerService.updatePassenger(id,passengerRequest));
     }
 
     @GetMapping("/page")
-    public Page<PassengerResponse> getSortedListOfPassengers(
+    public ResponseEntity<Page<PassengerResponse>> getSortedListOfPassengers(
             @RequestParam("offset") Integer offset,
             @RequestParam("limit") Integer limit
     ){
-        return passengerService.getPaginationList(offset,limit);
+        return ResponseEntity.ok(passengerService.getPaginationList(offset,limit));
     }
 
     @GetMapping("/sorted-list")
-    public PassengerListResponse sortedListOfPassengers(
+    public ResponseEntity<PassengerListResponse> sortedListOfPassengers(
             @RequestParam String type) throws SortTypeException {
-        return passengerService.getSortedListOfPassengers(type);
+        return ResponseEntity.ok(passengerService.getSortedListOfPassengers(type));
     }
 
 }
