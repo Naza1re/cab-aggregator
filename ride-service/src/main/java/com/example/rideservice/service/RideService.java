@@ -3,6 +3,7 @@ package com.example.rideservice.service;
 import com.example.rideservice.dto.request.RideRequest;
 import com.example.rideservice.dto.response.RideListResponse;
 import com.example.rideservice.dto.response.RideResponse;
+import com.example.rideservice.exception.RideAlreadyAcceptedException;
 import com.example.rideservice.exception.RideNotFoundException;
 import com.example.rideservice.model.Ride;
 import com.example.rideservice.repository.RideRepository;
@@ -25,6 +26,7 @@ public class RideService {
     public Ride fromRequestToEntity(RideRequest request){
         return modelMapper.map(request,Ride.class);
     }
+
     public RideResponse fromEntityToResponse(Ride ride){
         return modelMapper.map(ride,RideResponse.class);
     }
@@ -72,6 +74,7 @@ public class RideService {
         RideListResponse response = new RideListResponse(rideList);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
+
     public ResponseEntity<RideListResponse> getListOfRidesByDriverId(Long driverId) {
         List<RideResponse> rideList = rideRepository.getAllByDriverId(driverId)
                 .stream()
@@ -88,7 +91,8 @@ public class RideService {
         return new ResponseEntity<>(fromEntityToResponse(ride),HttpStatus.OK);
     }
 
-    public ResponseEntity<RideResponse> acceptRide(Long rideId, Long driverId) throws RideNotFoundException {
+    public ResponseEntity<RideResponse> acceptRide(Long rideId, Long driverId) throws RideNotFoundException, RideAlreadyAcceptedException {
+        checkRideAlreadyExist(rideId);
         Optional<Ride> opt_ride = rideRepository.findById(rideId);
         if (opt_ride.isPresent()) {
             opt_ride.get().setDriverId(driverId);
@@ -106,5 +110,11 @@ public class RideService {
         }
         else
             throw new RideNotFoundException("Ride with id '"+rideId+"' not founda");
+    }
+
+    public void checkRideAlreadyExist(Long ride_id) throws RideAlreadyAcceptedException {
+        if (rideRepository.existsByIdAndDriverIdIsNotNull(ride_id)) {
+            throw new RideAlreadyAcceptedException("Ride with id '"+ride_id+"' already has driver");
+        }
     }
 }
