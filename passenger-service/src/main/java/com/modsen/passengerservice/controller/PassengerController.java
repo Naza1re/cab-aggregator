@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/passengers")
+@RequestMapping("/api/v1/passengers")
 public class PassengerController {
 
     private final PassengerService passengerService;
@@ -25,31 +25,31 @@ public class PassengerController {
         return passengerService.getPassengerById(id);
     }
 
-    @GetMapping("/list-of-passengers")
+    @GetMapping("/list")
     public  ResponseEntity<PassengerListResponse> getAllPassengers(){
         return passengerService.getAllPassengers();
     }
 
-    @PostMapping("/create-passenger")
+    @PostMapping()
     public ResponseEntity<PassengerResponse> createPassenger(
            @Valid @RequestBody PassengerRequest passengerRequest) throws EmailAlreadyExistException, PhoneAlreadyExistException {
         return passengerService.createPassenger(passengerRequest);
     }
 
-    @DeleteMapping("/{id}/delete")
+    @DeleteMapping("/{id}")
     public HttpStatus deletePassenger(
             @PathVariable Long id) throws PassengerNotFoundException {
         return passengerService.deletePassenger(id);
     }
 
-    @PutMapping("/{id}/update")
+    @PutMapping("/{id}")
     public ResponseEntity<PassengerResponse> updatePassenger(
             @Valid @RequestBody PassengerRequest passengerRequest,
             @PathVariable Long id) throws PassengerNotFoundException, PhoneAlreadyExistException, EmailAlreadyExistException {
         return passengerService.updatePassenger(id,passengerRequest);
     }
 
-    @GetMapping("/get-list-with-pagination")
+    @GetMapping("/page")
     public ResponseEntity<Page<PassengerResponse>> getSortedListOfPassengers(
             @RequestParam("offset") Integer offset,
             @RequestParam("limit") Integer limit
