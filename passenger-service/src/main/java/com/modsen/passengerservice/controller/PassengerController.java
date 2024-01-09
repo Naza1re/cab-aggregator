@@ -33,13 +33,15 @@ public class PassengerController {
     @PostMapping
     public ResponseEntity<PassengerResponse> createPassenger(
            @Valid @RequestBody PassengerRequest passengerRequest)  {
-        return ResponseEntity.status(HttpStatus.CREATED).body(passengerService.createPassenger(passengerRequest));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(passengerService.createPassenger(passengerRequest));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<PassengerResponse> deletePassenger(
             @PathVariable Long id){
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(passengerService.deletePassenger(id));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(passengerService.deletePassenger(id));
     }
 
     @PutMapping("/{id}")
