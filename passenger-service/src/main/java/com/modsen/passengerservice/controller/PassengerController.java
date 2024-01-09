@@ -8,7 +8,6 @@ import com.modsen.passengerservice.dto.response.PassengerResponse;
 import com.modsen.passengerservice.service.PassengerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -53,15 +52,11 @@ public class PassengerController {
     @GetMapping("/page")
     public PassengerPageResponse getSortedListOfPassengers(
             @RequestParam("offset") Integer offset,
-            @RequestParam("limit") Integer limit
-    ) throws PaginationParamException {
-        return ResponseEntity.ok(passengerService.getPaginationList(offset,limit)).getBody();
+            @RequestParam("limit") Integer limit,
+            @RequestParam(name = "type",required = false) String type
+    ) throws PaginationParamException, SortTypeException {
+        return passengerService.getPassengerPage(offset,limit,type);
     }
 
-    @GetMapping("/sorted-list")
-    public ResponseEntity<PassengerListResponse> sortedListOfPassengers(
-            @RequestParam String type) throws SortTypeException {
-        return ResponseEntity.ok(passengerService.getSortedListOfPassengers(type));
-    }
 
 }

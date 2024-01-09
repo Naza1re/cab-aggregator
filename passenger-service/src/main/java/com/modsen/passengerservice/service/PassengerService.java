@@ -8,13 +8,11 @@ import com.modsen.passengerservice.repository.PassengerRepository;
 import com.modsen.passengerservice.dto.request.PassengerRequest;
 import com.modsen.passengerservice.dto.response.PassengerListResponse;
 import com.modsen.passengerservice.util.ExceptionMessages;
-import com.modsen.passengerservice.util.SortTypeConstants;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import java.lang.reflect.Field;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import java.util.*;
@@ -112,36 +110,56 @@ public class PassengerService {
         }
     }
 
-    public PassengerListResponse getSortedListOfPassengers(String type) throws SortTypeException {
-        List<Passenger> sortedPassengers = switch (type.toLowerCase()) {
-            case "name" -> passengerRepository.findAll(Sort.by(Sort.Order.asc(SortTypeConstants.SORT_TYPE_NAME)));
-            case "surname" -> passengerRepository.findAll(Sort.by(Sort.Order.asc(SortTypeConstants.SORT_TYPE_SURNAME)));
-            default -> throw new SortTypeException(String.format(ExceptionMessages.INVALID_TYPE_OF_SORT));
-        };
-
-        return new PassengerListResponse(sortedPassengers.stream()
-                .map(this::fromEntityToResponse)
-                .toList());
-
-    }
-
-    public PassengerPageResponse getPaginationList(
-            @Min(value = 0, message = "Offset must be greater than or equal to 0") Integer offset,
-            @Min(value = 1, message = "Limit must be greater than or equal to 1") Integer limit) throws PaginationParamException {
-        if (offset < 0 || limit < 1){
+    public PageRequest getPageRequest(int page, int size, String orderBy) throws PaginationParamException, SortTypeException {
+        if (page < 1 || size < 1) {
             throw new PaginationParamException(String.format(ExceptionMessages.PAGINATION_FORMAT_EXCEPTION));
         }
-        Pageable pageable = PageRequest.of(offset, limit);
-        Page<Passenger> passengerPage = passengerRepository.findAll(pageable);
 
-        List<PassengerResponse> passengerResponses = passengerPage.map(this::fromEntityToResponse).getContent();
-        return new PassengerPageResponse(passengerResponses, passengerPage.getTotalElements(), passengerPage.getTotalPages());
+        PageRequest pageRequest;
+        if (orderBy == null) {
+            pageRequest = PageRequest.of(page - 1, size);
+        } else {
+            validateSortingParameter(orderBy);
+            pageRequest = PageRequest.of(page - 1, size, Sort.by(orderBy));
+        }
+
+        return pageRequest;
+    }
+    private void validateSortingParameter(String orderBy) throws SortTypeException {
+        List<String> fieldNames = Arrays.stream(PassengerResponse.class.getDeclaredFields())
+                .map(Field::getName)
+                .toList();
+
+        if (!fieldNames.contains(orderBy)) {
+            throw new SortTypeException(ExceptionMessages.INVALID_TYPE_OF_SORT);
+        }
+    }
+    public PassengerPageResponse getPassengerPage(int page, int size, String orderBy) throws SortTypeException, PaginationParamException {
+
+        PageRequest pageRequest = getPageRequest(page, size, orderBy);
+        Page<Passenger> passengersPage = passengerRepository.findAll(pageRequest);
+
+        List<Passenger> retrievedPassengers = passengersPage.getContent();
+        long total = passengersPage.getTotalElements();
+
+        List<PassengerResponse> passengers = retrievedPassengers
+                .stream()
+                .map(this::fromEntityToResponse)
+                .toList();
+
+        return PassengerPageResponse.builder()
+                .passengerList(passengers)
+                .totalPages(page)
+                .totalElements(total)
+                .build();
     }
 
     public Passenger getOrThrow(Long id) throws PassengerNotFoundException {
         return passengerRepository.findById(id)
                 .orElseThrow(()-> new PassengerNotFoundException(String.format(ExceptionMessages.PASSENGER_NOT_FOUND_EXCEPTION,id)));
     }
+
+
 
 
 }
