@@ -12,20 +12,16 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.*;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-
 
 @Service
 @RequiredArgsConstructor
 public class DriverService {
+
     private final DriverRepository driverRepository;
     private final ModelMapper modelMapper;
 
@@ -36,42 +32,33 @@ public class DriverService {
         return modelMapper.map(driverRequest,Driver.class);
     }
 
-    public DriverResponse getDriverById(Long id) throws DriverNotFoundException {
-        Optional<Driver> opt_driver = driverRepository.findById(id);
-        if (opt_driver.isPresent()) {
-            return fromEntityToResponse(opt_driver.get());
-        }
-        else
-            throw new DriverNotFoundException("Driver with id '"+id+"' not found");
+    public DriverResponse getDriverById(Long id) {
+       Driver driver = getOrThrow(id);
+       return fromEntityToResponse(driver);
     }
 
-    public ResponseEntity<DriverListResponse> getListOfDrivers() {
+    public DriverListResponse getListOfDrivers() {
         List<DriverResponse> driverResponseList = driverRepository.findAll()
                 .stream()
                 .map(this::fromEntityToResponse)
                 .toList();
-        return new ResponseEntity<>(new DriverListResponse(driverResponseList),HttpStatus.OK);
+        return new DriverListResponse(driverResponseList);
     }
 
-
-    public ResponseEntity<DriverResponse> updateDriver(Long id, DriverRequest driverRequest) throws DriverNotFoundException, EmailAlreadyExistException, PhoneAlreadyExistException, CarNumberAlreadyExistException {
+    public DriverResponse updateDriver(Long id, DriverRequest driverRequest) {
 
         preUpdateEmailCheck(id,driverRequest);
         preUpdatePhoneCheck(id,driverRequest);
         preUpdateCarNumberCheck(id,driverRequest);
 
-        Optional<Driver> opt_driver = driverRepository.findById(id);
-        if (opt_driver.isPresent()) {
+        driverRepository.findById(id)
+                .orElseThrow(()-> new DriverNotFoundException(String.format(ExceptionMessages.DRIVER_NOT_FOUND_EXCEPTION,id)));
             Driver driver = fromRequestToEntity(driverRequest);
             driver.setId(id);
-            return new ResponseEntity<>(fromEntityToResponse(driverRepository.save(driver)),HttpStatus.OK);
-        }
-        else
-            throw new DriverNotFoundException("Driver with id '"+id+"' not found");
-
+            return fromEntityToResponse(driverRepository.save(driver));
     }
 
-    public ResponseEntity<DriverResponse> createDriver(DriverRequest driverRequest) throws EmailAlreadyExistException, PhoneAlreadyExistException, CarNumberAlreadyExistException {
+    public DriverResponse createDriver(DriverRequest driverRequest) {
 
         checkEmailExist(driverRequest.getEmail());
         checkPhoneExist(driverRequest.getPhone());
@@ -80,76 +67,64 @@ public class DriverService {
         Driver driver = fromRequestToEntity(driverRequest);
         driver.setAvailable(false);
         Driver savedDriver = driverRepository.save(driver);
-        return new ResponseEntity<>(fromEntityToResponse(savedDriver),HttpStatus.OK);
+
+        return fromEntityToResponse(savedDriver);
     }
 
-    public HttpStatus deleteDriver(Long id) throws DriverNotFoundException {
-        Optional<Driver> opt_driver = driverRepository.findById(id);
-        if (opt_driver.isPresent()) {
-            driverRepository.delete(opt_driver.get());
-            return HttpStatus.OK;
-        }
-        else
-            throw new DriverNotFoundException("Driver with id '"+id+"' not found");
+    public DriverResponse deleteDriver(Long id) {
+       Driver driver = getOrThrow(id);
+       driverRepository.delete(driver);
+       return fromEntityToResponse(driver);
     }
-    public void preUpdateEmailCheck(Long driver_id,DriverRequest driverRequest) throws EmailAlreadyExistException, DriverNotFoundException {
-        Optional<Driver> opt_driver = driverRepository.findById(driver_id);
-        if (opt_driver.isPresent()) {
-            if(!opt_driver.get().getEmail().equals(driverRequest.getEmail())){
+
+    public void preUpdateEmailCheck(Long driver_id,DriverRequest driverRequest) {
+        Driver driver = getOrThrow(driver_id);
+            if(!driver.getEmail().equals(driverRequest.getEmail())){
                 checkEmailExist(driverRequest.getEmail());
             }
-        }
-        else
-            throw new DriverNotFoundException("Driver with id '"+driver_id+"' not found");
     }
-    public void preUpdatePhoneCheck(Long driver_id,DriverRequest driverRequest) throws DriverNotFoundException, PhoneAlreadyExistException {
-        Optional<Driver> opt_driver = driverRepository.findById(driver_id);
-        if (opt_driver.isPresent()) {
-            if(!opt_driver.get().getPhone().equals(driverRequest.getPhone())){
+
+    public void preUpdatePhoneCheck(Long driver_id,DriverRequest driverRequest) {
+        Driver driver = getOrThrow(driver_id);
+            if(!driver.getPhone().equals(driverRequest.getPhone())){
                 checkPhoneExist(driverRequest.getPhone());
             }
-        }
-        else
-            throw new DriverNotFoundException("Driver with id '"+driver_id+"' not found");
     }
-    public void preUpdateCarNumberCheck(Long driver_id,DriverRequest driverRequest) throws CarNumberAlreadyExistException {
-        Optional<Driver> opt_driver = driverRepository.findById(driver_id);
-        if (opt_driver.isPresent()) {
-            if(!opt_driver.get().getNumber().equals(driverRequest.getNumber())){
-                System.out.println(driverRequest.getNumber());
+
+    public void preUpdateCarNumberCheck(Long driver_id,DriverRequest driverRequest) {
+        Driver driver = getOrThrow(driver_id);
+            if(!driver.getNumber().equals(driverRequest.getNumber())){
                 checkCarNumberExist(driverRequest.getNumber());
             }
+    }
+
+    public void checkEmailExist(String email) {
+        if (driverRepository.existsByEmail(email) ){
+            throw new EmailAlreadyExistException(String.format(ExceptionMessages.DRIVER_WITH_EMAIL_ALREADY_EXIST,email));
         }
     }
 
-    public void checkEmailExist(String email) throws EmailAlreadyExistException {
-        Optional<Driver> opt_driver = driverRepository.findByEmail(email);
-        if (opt_driver.isPresent()) {
-            throw new EmailAlreadyExistException("Driver with email '"+email+"' already exist");
-        }
-    }
-    public void checkPhoneExist(String phone) throws PhoneAlreadyExistException {
-        Optional<Driver> opt_driver = driverRepository.findByPhone(phone);
-        if (opt_driver.isPresent()) {
-            throw new PhoneAlreadyExistException("Driver with phone '"+phone+"' already exist");
-        }
-    }
-    public void checkCarNumberExist(String carNum) throws CarNumberAlreadyExistException {
-        System.out.println(carNum);
-        Optional<Driver> opt_driver = driverRepository.findByNumber(carNum);
-        if (opt_driver.isPresent()) {
-            throw new CarNumberAlreadyExistException("Car with number '"+carNum+"' already exist");
+    public void checkPhoneExist(String phone) {
+        if (driverRepository.existsByPhone(phone)) {
+            throw new PhoneAlreadyExistException(String.format(ExceptionMessages.DRIVER_WITH_PHONE_ALREADY_EXIST,phone));
         }
     }
 
-    public ResponseEntity<DriverListResponse> getAvailableDrivers() {
+    public void checkCarNumberExist(String carNum) {
+        if (driverRepository.existsByNumber(carNum)) {
+            throw new CarNumberAlreadyExistException(String.format(ExceptionMessages.DRIVER_WITH_CAR_NUMBER_ALREADY_EXIST, carNum));
+        }
+    }
+
+    public DriverListResponse getAvailableDrivers() {
         List<Driver> listOfAvailableDrivers = driverRepository.getAllByAvailable(true);
         List<DriverResponse> listOfAvailable =  listOfAvailableDrivers
                 .stream()
                 .map(this::fromEntityToResponse)
                 .toList();
-        return new ResponseEntity<>(new DriverListResponse(listOfAvailable),HttpStatus.OK);
+        return new DriverListResponse(listOfAvailable);
     }
+
     public PageRequest getPageRequest(int page, int size, String orderBy) {
         if (page < 1 || size < 1) {
             throw new PaginationParamException(String.format(ExceptionMessages.PAGINATION_FORMAT_EXCEPTION));
@@ -165,6 +140,7 @@ public class DriverService {
 
         return pageRequest;
     }
+
     public DriverPageResponse getDriverPage(int page, int size, String orderBy) {
 
         PageRequest pageRequest = getPageRequest(page, size, orderBy);
@@ -183,6 +159,7 @@ public class DriverService {
                 .totalElements(total)
                 .build();
     }
+
     private void validateSortingParameter(String orderBy) {
         List<String> fieldNames = Arrays.stream(DriverResponse.class.getDeclaredFields())
                 .map(Field::getName)
@@ -193,79 +170,36 @@ public class DriverService {
         }
     }
 
-    public ResponseEntity<Page<DriverResponse>> getPaginationList(Integer offset, Integer limit) {
-        Pageable pageable = PageRequest.of(offset, limit);
-        Page<Driver> passengerPage = driverRepository.findAll(pageable);
-
-        Page<DriverResponse> passengerResponsePage = passengerPage.map(this::fromEntityToResponse);
-
-        return ResponseEntity.ok(passengerResponsePage);
+    public DriverResponse startRideWithDriverId(Long driverId) {
+        Driver driver = getOrThrow(driverId);
+            driver.setAvailable(false);
+            driverRepository.save(driver);
+            return fromEntityToResponse(driver);
     }
 
-
-    public ResponseEntity<DriverListResponse> getSortedListOfPassengers(String type) throws SortTypeException {
-        List<Driver> sortedPassengers = switch (type.toLowerCase()) {
-            case "name" -> driverRepository.findAll(Sort.by(Sort.Order.asc("name")));
-            case "surname" -> driverRepository.findAll(Sort.by(Sort.Order.asc("surname")));
-            default -> throw new SortTypeException("Invalid type of sort");
-        };
-
-        return new ResponseEntity<>(new DriverListResponse(sortedPassengers
-                .stream()
-                .map(this::fromEntityToResponse)
-                .toList()),HttpStatus.OK);
+    public DriverResponse endRide(Long driverId) throws DriverNotFoundException {
+        Driver driver = getOrThrow(driverId);
+            driver.setAvailable(true);
+            driverRepository.save(driver);
+            return fromEntityToResponse(driver);
     }
 
-    public ResponseEntity<DriverResponse> startRideWithDriverId(Long driverId) throws DriverNotFoundException {
-        Optional<Driver> opt_driver = driverRepository.findById(driverId);
-        if (opt_driver.isPresent()) {
-            opt_driver.get().setAvailable(false);
-            driverRepository.save(opt_driver.get());
-            return new ResponseEntity<>(fromEntityToResponse(opt_driver.get()),HttpStatus.OK);
-        }
-        else
-            throw new DriverNotFoundException("Driver with id '"+driverId+"' not found");
+    public DriverResponse startWorkingDay(Long id) throws DriverNotFoundException {
+        Driver driver = getOrThrow(id);
+            driver.setAvailable(true);
+            driverRepository.save(driver);
+            return fromEntityToResponse(driver);
     }
 
-    public ResponseEntity<DriverResponse> endRide(Long driverId) throws DriverNotFoundException {
-        Optional<Driver> opt_driver = driverRepository.findById(driverId);
-        if (opt_driver.isPresent()) {
-            opt_driver.get().setAvailable(true);
-            driverRepository.save(opt_driver.get());
-            return new ResponseEntity<>(fromEntityToResponse(opt_driver.get()),HttpStatus.OK);
-        }
-        else
-            throw new DriverNotFoundException("Driver with id '"+driverId+"' not found");
+    public DriverResponse endWorkingDay(Long id) throws DriverNotFoundException {
+        Driver driver = getOrThrow(id);
+            driver.setAvailable(false);
+            driverRepository.save(driver);
+            return fromEntityToResponse(driver);
     }
 
-    public HttpStatus startWorkingDay(Long id) throws DriverNotFoundException {
-        Optional<Driver> opt_driver = driverRepository.findById(id);
-        if (opt_driver.isPresent()) {
-            opt_driver.get().setAvailable(true);
-            driverRepository.save(opt_driver.get());
-            return HttpStatus.OK;
-        }
-        else
-            throw new DriverNotFoundException("Driver with id '"+id+"' not found");
-    }
-
-    public HttpStatus endWorkingDay(Long id) throws DriverNotFoundException {
-        Optional<Driver> opt_driver = driverRepository.findById(id);
-        if (opt_driver.isPresent()) {
-            opt_driver.get().setAvailable(false);
-            driverRepository.save(opt_driver.get());
-            return HttpStatus.OK;
-        }
-        else
-            throw new DriverNotFoundException("Driver with id '"+id+"' not found");
-    }
-
-    public ResponseEntity<DriverResponse> getDriverByCarNumber(String carNumber) throws DriverNotFoundException {
-        Optional<Driver> opt_driver = driverRepository.findByNumber(carNumber);
-        if (opt_driver.isPresent()) {
-            return new ResponseEntity<>(fromEntityToResponse(opt_driver.get()),HttpStatus.OK);
-        }
-        else
-            throw new DriverNotFoundException("Driver with car number '"+carNumber+"' not found");
+    public Driver getOrThrow(Long id){
+        return driverRepository.findById(id)
+                .orElseThrow(()-> new DriverNotFoundException(String.format(ExceptionMessages.DRIVER_NOT_FOUND_EXCEPTION,id)));
     }
 }

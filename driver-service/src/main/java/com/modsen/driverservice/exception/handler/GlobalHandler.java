@@ -55,6 +55,14 @@ public class GlobalHandler {
                 .body(new AppError(errorMessage));
     }
 
+    @ExceptionHandler(PaginationParamException.class)
+    public ResponseEntity<AppError> handlePaginationParamException(
+            PaginationParamException ex){
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new AppError(errorMessage));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(
             MethodArgumentNotValidException ex) {
