@@ -19,35 +19,40 @@ public class GlobalHandler {
     public ResponseEntity<AppError> handleDriverNotFoundException(
             DriverNotFoundException ex){
         String errorMessage = ex.getMessage();
-        return new ResponseEntity<>(new AppError(errorMessage), HttpStatus.NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new AppError(errorMessage));
     }
 
     @ExceptionHandler(EmailAlreadyExistException.class)
     public ResponseEntity<AppError>  handleEmailAlreadyExistException(
             EmailAlreadyExistException ex){
         String errorMessage = ex.getMessage();
-        return new ResponseEntity<>(new AppError(errorMessage),HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new AppError(errorMessage));
     }
 
     @ExceptionHandler(SortTypeException.class)
     public ResponseEntity<AppError> handleSortTypeException(
             SortTypeException ex){
         String errorMessage = ex.getMessage();
-        return new ResponseEntity<>(new AppError(errorMessage),HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new AppError(errorMessage));
     }
 
     @ExceptionHandler(PhoneAlreadyExistException.class)
     public ResponseEntity<AppError>  handlePhoneAlreadyExistException(
             PhoneAlreadyExistException ex){
         String errorMessage = ex.getMessage();
-        return new ResponseEntity<>(new AppError(errorMessage),HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new AppError(errorMessage));
     }
 
     @ExceptionHandler(CarNumberAlreadyExistException.class)
     public ResponseEntity<AppError>  handleCarNumberAlreadyExistException(
             CarNumberAlreadyExistException ex){
         String errorMessage = ex.getMessage();
-        return new ResponseEntity<>(new AppError(errorMessage),HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new AppError(errorMessage));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -62,7 +67,8 @@ public class GlobalHandler {
             errors.put(fieldName, errorMessage);
         });
 
-        return new ResponseEntity<>(errors,HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(errors);
     }
 
 }
