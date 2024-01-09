@@ -10,5 +10,4 @@ public class AppError  {
 
     private String message;
 
-
 }

@@ -20,28 +20,40 @@ public class GlobalExceptionHandler {
     public ResponseEntity<AppError> handlePassengerNotFoundException(
             PassengerNotFoundException ex) {
         String errorMessage = ex.getMessage();
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new AppError(errorMessage));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new AppError(errorMessage));
     }
 
     @ExceptionHandler(PhoneAlreadyExistException.class)
     public ResponseEntity<AppError> handlePhoneAlreadyExistException(
             PhoneAlreadyExistException ex){
         String errorMessage = ex.getMessage();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AppError(errorMessage));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new AppError(errorMessage));
     }
 
     @ExceptionHandler(EmailAlreadyExistException.class)
     public ResponseEntity<AppError> handleEmailAlreadyExistException(
             EmailAlreadyExistException ex){
         String errorMessage = ex.getMessage();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AppError(errorMessage));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new AppError(errorMessage));
     }
 
     @ExceptionHandler(SortTypeException.class)
     public ResponseEntity<AppError> handleSortTypeException(
             SortTypeException ex){
         String errorMessage = ex.getMessage();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AppError(errorMessage));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new AppError(errorMessage));
+    }
+
+    @ExceptionHandler(PaginationParamException.class)
+    public ResponseEntity<AppError> handlePaginationParamException(
+            PaginationParamException ex){
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new AppError(errorMessage));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -55,7 +67,8 @@ public class GlobalExceptionHandler {
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(errors);
     }
 
 }

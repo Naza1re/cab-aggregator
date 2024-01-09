@@ -1,13 +1,15 @@
 package com.modsen.passengerservice.service;
 
+import com.modsen.passengerservice.dto.response.PassengerPageResponse;
+import com.modsen.passengerservice.dto.response.PassengerResponse;
 import com.modsen.passengerservice.exception.*;
 import com.modsen.passengerservice.model.Passenger;
 import com.modsen.passengerservice.repository.PassengerRepository;
 import com.modsen.passengerservice.dto.request.PassengerRequest;
 import com.modsen.passengerservice.dto.response.PassengerListResponse;
-import com.modsen.passengerservice.dto.response.PassengerResponse;
-import com.modsen.passengerservice.util.Constants;
-import com.modsen.passengerservice.util.Messages;
+import com.modsen.passengerservice.util.ExceptionMessages;
+import com.modsen.passengerservice.util.SortTypeConstants;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -25,7 +27,7 @@ public class PassengerService {
     private final ModelMapper modelMapper;
 
     public PassengerResponse fromEntityToResponse(Passenger passenger){
-        return modelMapper.map(passenger,PassengerResponse.class);
+        return modelMapper.map(passenger, PassengerResponse.class);
     }
 
     public Passenger fromRequestToEntity(PassengerRequest passengerRequest){
@@ -33,15 +35,13 @@ public class PassengerService {
     }
 
     public PassengerResponse getPassengerById(Long id) throws PassengerNotFoundException {
-        Passenger passenger = passengerRepository.findById(id).orElseThrow(()->
-                new PassengerNotFoundException(String.format(Messages.PASSENGER_NOT_FOUND_EXCEPTION,id)));
-            return fromEntityToResponse(passenger);
+        Passenger passenger = getOrThrow(id);
+        return fromEntityToResponse(passenger);
 
     }
 
     public PassengerListResponse getAllPassengers(){
-          List<PassengerResponse> listOfPassengers = passengerRepository.findAll()
-                .stream()
+          List<PassengerResponse> listOfPassengers = passengerRepository.findAll().stream()
                 .map(this::fromEntityToResponse)
                 .toList();
         return new PassengerListResponse(listOfPassengers);
@@ -65,7 +65,7 @@ public class PassengerService {
         preUpdatePhoneCheck(id,passengerRequest);
 
         passengerRepository.findById(id)
-                .orElseThrow(()-> new PassengerNotFoundException(String.format(Messages.PASSENGER_NOT_FOUND_EXCEPTION,id)));
+                .orElseThrow(()-> new PassengerNotFoundException(String.format(ExceptionMessages.PASSENGER_NOT_FOUND_EXCEPTION,id)));
             Passenger passenger = fromRequestToEntity(passengerRequest);
             passenger.setId(id);
             return fromEntityToResponse(passengerRepository.save(passenger));
@@ -73,8 +73,7 @@ public class PassengerService {
     }
 
     public PassengerResponse deletePassenger(Long id) throws PassengerNotFoundException {
-       Passenger passenger = passengerRepository.findById(id).orElseThrow(()->
-               new PassengerNotFoundException(String.format(Messages.PASSENGER_NOT_FOUND_EXCEPTION,id)));
+       Passenger passenger = getOrThrow(id);
             passengerRepository.delete(passenger);
             return fromEntityToResponse(passenger);
 
@@ -82,8 +81,8 @@ public class PassengerService {
 
     public void preUpdateEmailCheck(Long passengerId, PassengerRequest passengerRequest)
             throws EmailAlreadyExistException, PassengerNotFoundException {
-        Passenger passenger = passengerRepository.findById(passengerId)
-                .orElseThrow(() -> new PassengerNotFoundException(String.format(Messages.PASSENGER_NOT_FOUND_EXCEPTION, passengerId)));
+
+        Passenger passenger = getOrThrow(passengerId);
 
         if (!passenger.getEmail().equals(passengerRequest.getEmail())) {
             checkEmailExist(passengerRequest.getEmail());
@@ -92,8 +91,7 @@ public class PassengerService {
 
     public void preUpdatePhoneCheck(Long passengerId, PassengerRequest passengerRequest)
             throws PassengerNotFoundException, PhoneAlreadyExistException {
-        Passenger passenger = passengerRepository.findById(passengerId)
-                .orElseThrow(() -> new PassengerNotFoundException(String.format(Messages.PASSENGER_NOT_FOUND_EXCEPTION, passengerId)));
+        Passenger passenger = getOrThrow(passengerId);
 
         if (!passenger.getPhone().equals(passengerRequest.getPhone())) {
             checkPhoneExist(passengerRequest.getPhone());
@@ -102,37 +100,47 @@ public class PassengerService {
 
     public void checkEmailExist(String email) throws EmailAlreadyExistException {
 
-        Optional<Passenger> opt_passenger = passengerRepository.findByEmail(email);
-        if (opt_passenger.isPresent()) {
-            throw new EmailAlreadyExistException(String.format(Messages.PASSENGER_WITH_EMAIL_ALREADY_EXIST,email));
+        if (passengerRepository.existsByEmail(email)) {
+            throw new EmailAlreadyExistException(String.format(ExceptionMessages.PASSENGER_WITH_EMAIL_ALREADY_EXIST,email));
         }
     }
 
     public void checkPhoneExist(String phone) throws  PhoneAlreadyExistException {
-        Optional<Passenger> opt_passenger = passengerRepository.findByPhone(phone);
-        if (opt_passenger.isPresent()) {
-            throw new PhoneAlreadyExistException(String.format(Messages.PASSENGER_WITH_PHONE_ALREADY_EXIST,phone));
+
+        if (passengerRepository.existsByPhone(phone)) {
+            throw new PhoneAlreadyExistException(String.format(ExceptionMessages.PASSENGER_WITH_PHONE_ALREADY_EXIST,phone));
         }
     }
 
     public PassengerListResponse getSortedListOfPassengers(String type) throws SortTypeException {
         List<Passenger> sortedPassengers = switch (type.toLowerCase()) {
-            case "name" -> passengerRepository.findAll(Sort.by(Sort.Order.asc(Constants.SORT_TYPE_NAME)));
-            case "surname" -> passengerRepository.findAll(Sort.by(Sort.Order.asc(Constants.SORT_TYPE_SURNAME)));
-            default -> throw new SortTypeException(String.format(Messages.INVALID_TYPE_OF_SORT));
+            case "name" -> passengerRepository.findAll(Sort.by(Sort.Order.asc(SortTypeConstants.SORT_TYPE_NAME)));
+            case "surname" -> passengerRepository.findAll(Sort.by(Sort.Order.asc(SortTypeConstants.SORT_TYPE_SURNAME)));
+            default -> throw new SortTypeException(String.format(ExceptionMessages.INVALID_TYPE_OF_SORT));
         };
 
-        return new PassengerListResponse(sortedPassengers
-                .stream()
+        return new PassengerListResponse(sortedPassengers.stream()
                 .map(this::fromEntityToResponse)
                 .toList());
 
     }
 
-    public Page<PassengerResponse> getPaginationList(Integer offset, Integer limit) {
+    public PassengerPageResponse getPaginationList(
+            @Min(value = 0, message = "Offset must be greater than or equal to 0") Integer offset,
+            @Min(value = 1, message = "Limit must be greater than or equal to 1") Integer limit) throws PaginationParamException {
+        if (offset < 0 || limit < 1){
+            throw new PaginationParamException(String.format(ExceptionMessages.PAGINATION_FORMAT_EXCEPTION));
+        }
         Pageable pageable = PageRequest.of(offset, limit);
         Page<Passenger> passengerPage = passengerRepository.findAll(pageable);
-        return passengerPage.map(this::fromEntityToResponse);
+
+        List<PassengerResponse> passengerResponses = passengerPage.map(this::fromEntityToResponse).getContent();
+        return new PassengerPageResponse(passengerResponses, passengerPage.getTotalElements(), passengerPage.getTotalPages());
+    }
+
+    public Passenger getOrThrow(Long id) throws PassengerNotFoundException {
+        return passengerRepository.findById(id)
+                .orElseThrow(()-> new PassengerNotFoundException(String.format(ExceptionMessages.PASSENGER_NOT_FOUND_EXCEPTION,id)));
     }
 
 
