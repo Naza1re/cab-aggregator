@@ -23,7 +23,7 @@ public class DriverRatingService {
     private final DriverMapper driverMapper;
 
     public ResponseEntity<DriverResponse> getDriverById(Long driverId) throws DriverRatingNotFoundException {
-        Optional<DriverRating> opt_driverRating = driverRatingRepository.findById(driverId);
+        Optional<DriverRating> opt_driverRating = driverRatingRepository.findDriverRatingByDriver(driverId);
         if (opt_driverRating.isPresent()) {
             return new ResponseEntity<>(driverMapper.fromEntityToResponse(opt_driverRating.get()), HttpStatus.OK);
         }
