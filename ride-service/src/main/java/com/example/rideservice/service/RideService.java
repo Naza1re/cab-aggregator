@@ -5,8 +5,10 @@ import com.example.rideservice.dto.response.RideListResponse;
 import com.example.rideservice.dto.response.RideResponse;
 import com.example.rideservice.exception.RideAlreadyAcceptedException;
 import com.example.rideservice.exception.RideNotFoundException;
+import com.example.rideservice.exception.RideNotHaveDriverException;
 import com.example.rideservice.model.Ride;
 import com.example.rideservice.repository.RideRepository;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -31,7 +33,8 @@ public class RideService {
         return modelMapper.map(ride,RideResponse.class);
     }
 
-    public ResponseEntity<RideResponse> startRideWithPassengerAndDriver(Long ride_id) throws RideNotFoundException {
+    public ResponseEntity<RideResponse> startRideWithPassengerAndDriver(Long ride_id) throws RideNotFoundException, RideAlreadyAcceptedException {
+        checkRideHasDriver(ride_id);
         Optional<Ride> opt_ride = rideRepository.findById(ride_id);
         if (opt_ride.isPresent()) {
             opt_ride.get().setStartDate(LocalDate.now());
@@ -53,7 +56,17 @@ public class RideService {
             throw new RideNotFoundException("Ride with id '"+id+"' not found");
     }
 
-   public ResponseEntity<RideResponse> endRide(Long rideId) throws RideNotFoundException {
+    public void checkRideHasDriver(Long id){
+        Optional<Ride> opt_ride = rideRepository.findById(id);
+        if(opt_ride.isPresent()){
+            if(opt_ride.get().getDriverId()==null){
+                throw new RideNotHaveDriverException("Ride with id '"+id+"' not have driver yet");
+            }
+        }
+    }
+
+   public ResponseEntity<RideResponse> endRide(Long rideId) throws RideNotFoundException, RideAlreadyAcceptedException {
+        checkRideHasDriver(rideId);
         Optional<Ride> opt_ride = rideRepository.findById(rideId);
         if (opt_ride.isPresent()) {
             opt_ride.get().setEndDate(LocalDate.now());
@@ -86,7 +99,6 @@ public class RideService {
 
     public ResponseEntity<RideResponse> findRide(RideRequest rideRequest) {
         Ride ride = fromRequestToEntity(rideRequest);
-        ride.setStartDate(LocalDate.now());
         rideRepository.save(ride);
         return new ResponseEntity<>(fromEntityToResponse(ride),HttpStatus.OK);
     }

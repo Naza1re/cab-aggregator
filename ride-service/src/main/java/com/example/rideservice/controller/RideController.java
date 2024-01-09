@@ -38,7 +38,7 @@ public class RideController {
 
     @PutMapping("/{ride_id}/start-ride")
     public ResponseEntity<RideResponse> startRide(
-            @PathVariable Long ride_id) throws RideNotFoundException {
+            @PathVariable Long ride_id) throws RideNotFoundException, RideAlreadyAcceptedException {
         return rideService.startRideWithPassengerAndDriver(ride_id);
     }
 
@@ -48,7 +48,7 @@ public class RideController {
     }
 
     @PutMapping("/{ride_id}/end-ride")
-    public ResponseEntity<RideResponse> endRide(@PathVariable Long ride_id) throws RideNotFoundException {
+    public ResponseEntity<RideResponse> endRide(@PathVariable Long ride_id) throws RideNotFoundException, RideAlreadyAcceptedException {
         return rideService.endRide(ride_id);
     }
 
