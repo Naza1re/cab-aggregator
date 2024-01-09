@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: create-passenger
+      id: 2
       author: nikita
       changes:
         - createTable:
@@ -15,22 +15,22 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: name
-                  type: varchar(200)
+                  type: varchar(20)
                   constraints:
                     nullable: false
               - column:
                   name: surname
-                  type: varchar(200)
+                  type: varchar(20)
                   constraints:
                     nullable: false
               - column:
                   name: phone
-                  type: varchar(200)
+                  type: varchar(15)
                   constraints:
                     nullable: false
               - column:
                   name: email
-                  type: varchar(200)
+                  type: varchar(50)
                   constraints:
                     nullable: false
       rollback:
