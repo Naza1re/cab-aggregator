@@ -21,7 +21,7 @@ public class PassengerController {
 
     @GetMapping("/{id}")
     public ResponseEntity<PassengerResponse> getPassengerById(
-            @PathVariable Long id) throws PassengerNotFoundException {
+            @PathVariable Long id){
         return ResponseEntity.ok(passengerService.getPassengerById(id));
     }
 
@@ -32,20 +32,20 @@ public class PassengerController {
 
     @PostMapping
     public ResponseEntity<PassengerResponse> createPassenger(
-           @Valid @RequestBody PassengerRequest passengerRequest) throws EmailAlreadyExistException, PhoneAlreadyExistException {
+           @Valid @RequestBody PassengerRequest passengerRequest)  {
         return ResponseEntity.status(HttpStatus.CREATED).body(passengerService.createPassenger(passengerRequest));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<PassengerResponse> deletePassenger(
-            @PathVariable Long id) throws PassengerNotFoundException {
+            @PathVariable Long id){
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(passengerService.deletePassenger(id));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<PassengerResponse> updatePassenger(
             @Valid @RequestBody PassengerRequest passengerRequest,
-            @PathVariable Long id) throws PassengerNotFoundException, PhoneAlreadyExistException, EmailAlreadyExistException {
+            @PathVariable Long id){
         return ResponseEntity.ok(passengerService.updatePassenger(id,passengerRequest));
     }
 
@@ -54,7 +54,7 @@ public class PassengerController {
             @RequestParam("offset") Integer offset,
             @RequestParam("limit") Integer limit,
             @RequestParam(name = "type",required = false) String type
-    ) throws PaginationParamException, SortTypeException {
+    ){
         return passengerService.getPassengerPage(offset,limit,type);
     }
 

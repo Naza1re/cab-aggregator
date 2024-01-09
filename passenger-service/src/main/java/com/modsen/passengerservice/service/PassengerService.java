@@ -32,7 +32,7 @@ public class PassengerService {
         return modelMapper.map(passengerRequest, Passenger.class);
     }
 
-    public PassengerResponse getPassengerById(Long id) throws PassengerNotFoundException {
+    public PassengerResponse getPassengerById(Long id) {
         Passenger passenger = getOrThrow(id);
         return fromEntityToResponse(passenger);
 
@@ -45,7 +45,7 @@ public class PassengerService {
         return new PassengerListResponse(listOfPassengers);
     }
 
-    public PassengerResponse createPassenger(PassengerRequest passengerRequest) throws  EmailAlreadyExistException, PhoneAlreadyExistException {
+    public PassengerResponse createPassenger(PassengerRequest passengerRequest) {
 
         checkEmailExist(passengerRequest.getEmail());
         checkPhoneExist(passengerRequest.getPhone());
@@ -56,8 +56,7 @@ public class PassengerService {
         return fromEntityToResponse(savedPassenger);
     }
 
-    public PassengerResponse updatePassenger(Long id, PassengerRequest passengerRequest)
-            throws PassengerNotFoundException, EmailAlreadyExistException, PhoneAlreadyExistException {
+    public PassengerResponse updatePassenger(Long id, PassengerRequest passengerRequest) {
 
         preUpdateEmailCheck(id,passengerRequest);
         preUpdatePhoneCheck(id,passengerRequest);
@@ -70,15 +69,14 @@ public class PassengerService {
 
     }
 
-    public PassengerResponse deletePassenger(Long id) throws PassengerNotFoundException {
+    public PassengerResponse deletePassenger(Long id) {
        Passenger passenger = getOrThrow(id);
             passengerRepository.delete(passenger);
             return fromEntityToResponse(passenger);
 
     }
 
-    public void preUpdateEmailCheck(Long passengerId, PassengerRequest passengerRequest)
-            throws EmailAlreadyExistException, PassengerNotFoundException {
+    public void preUpdateEmailCheck(Long passengerId, PassengerRequest passengerRequest) {
 
         Passenger passenger = getOrThrow(passengerId);
 
@@ -87,8 +85,7 @@ public class PassengerService {
         }
     }
 
-    public void preUpdatePhoneCheck(Long passengerId, PassengerRequest passengerRequest)
-            throws PassengerNotFoundException, PhoneAlreadyExistException {
+    public void preUpdatePhoneCheck(Long passengerId, PassengerRequest passengerRequest) {
         Passenger passenger = getOrThrow(passengerId);
 
         if (!passenger.getPhone().equals(passengerRequest.getPhone())) {
@@ -96,21 +93,21 @@ public class PassengerService {
         }
     }
 
-    public void checkEmailExist(String email) throws EmailAlreadyExistException {
+    public void checkEmailExist(String email) {
 
         if (passengerRepository.existsByEmail(email)) {
             throw new EmailAlreadyExistException(String.format(ExceptionMessages.PASSENGER_WITH_EMAIL_ALREADY_EXIST,email));
         }
     }
 
-    public void checkPhoneExist(String phone) throws  PhoneAlreadyExistException {
+    public void checkPhoneExist(String phone) {
 
         if (passengerRepository.existsByPhone(phone)) {
             throw new PhoneAlreadyExistException(String.format(ExceptionMessages.PASSENGER_WITH_PHONE_ALREADY_EXIST,phone));
         }
     }
 
-    public PageRequest getPageRequest(int page, int size, String orderBy) throws PaginationParamException, SortTypeException {
+    public PageRequest getPageRequest(int page, int size, String orderBy) {
         if (page < 1 || size < 1) {
             throw new PaginationParamException(String.format(ExceptionMessages.PAGINATION_FORMAT_EXCEPTION));
         }
@@ -125,7 +122,7 @@ public class PassengerService {
 
         return pageRequest;
     }
-    private void validateSortingParameter(String orderBy) throws SortTypeException {
+    private void validateSortingParameter(String orderBy) {
         List<String> fieldNames = Arrays.stream(PassengerResponse.class.getDeclaredFields())
                 .map(Field::getName)
                 .toList();
@@ -134,7 +131,7 @@ public class PassengerService {
             throw new SortTypeException(ExceptionMessages.INVALID_TYPE_OF_SORT);
         }
     }
-    public PassengerPageResponse getPassengerPage(int page, int size, String orderBy) throws SortTypeException, PaginationParamException {
+    public PassengerPageResponse getPassengerPage(int page, int size, String orderBy) {
 
         PageRequest pageRequest = getPageRequest(page, size, orderBy);
         Page<Passenger> passengersPage = passengerRepository.findAll(pageRequest);
@@ -142,8 +139,7 @@ public class PassengerService {
         List<Passenger> retrievedPassengers = passengersPage.getContent();
         long total = passengersPage.getTotalElements();
 
-        List<PassengerResponse> passengers = retrievedPassengers
-                .stream()
+        List<PassengerResponse> passengers = retrievedPassengers.stream()
                 .map(this::fromEntityToResponse)
                 .toList();
 
@@ -154,12 +150,9 @@ public class PassengerService {
                 .build();
     }
 
-    public Passenger getOrThrow(Long id) throws PassengerNotFoundException {
+    public Passenger getOrThrow(Long id) {
         return passengerRepository.findById(id)
                 .orElseThrow(()-> new PassengerNotFoundException(String.format(ExceptionMessages.PASSENGER_NOT_FOUND_EXCEPTION,id)));
     }
-
-
-
 
 }
