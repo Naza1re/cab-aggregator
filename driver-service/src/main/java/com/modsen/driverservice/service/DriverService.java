@@ -2,10 +2,12 @@ package com.modsen.driverservice.service;
 
 import com.modsen.driverservice.dto.request.DriverRequest;
 import com.modsen.driverservice.dto.response.DriverListResponse;
+import com.modsen.driverservice.dto.response.DriverPageResponse;
 import com.modsen.driverservice.dto.response.DriverResponse;
 import com.modsen.driverservice.exception.*;
 import com.modsen.driverservice.model.Driver;
 import com.modsen.driverservice.repository.DriverRepository;
+import com.modsen.driverservice.util.ExceptionMessages;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -15,6 +17,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,10 +36,10 @@ public class DriverService {
         return modelMapper.map(driverRequest,Driver.class);
     }
 
-    public ResponseEntity<DriverResponse> getDriverById(Long id) throws DriverNotFoundException {
+    public DriverResponse getDriverById(Long id) throws DriverNotFoundException {
         Optional<Driver> opt_driver = driverRepository.findById(id);
         if (opt_driver.isPresent()) {
-            return new ResponseEntity<>(fromEntityToResponse(opt_driver.get()), HttpStatus.OK);
+            return fromEntityToResponse(opt_driver.get());
         }
         else
             throw new DriverNotFoundException("Driver with id '"+id+"' not found");
@@ -145,6 +149,48 @@ public class DriverService {
                 .map(this::fromEntityToResponse)
                 .toList();
         return new ResponseEntity<>(new DriverListResponse(listOfAvailable),HttpStatus.OK);
+    }
+    public PageRequest getPageRequest(int page, int size, String orderBy) {
+        if (page < 1 || size < 1) {
+            throw new PaginationParamException(String.format(ExceptionMessages.PAGINATION_FORMAT_EXCEPTION));
+        }
+
+        PageRequest pageRequest;
+        if (orderBy == null) {
+            pageRequest = PageRequest.of(page - 1, size);
+        } else {
+            validateSortingParameter(orderBy);
+            pageRequest = PageRequest.of(page - 1, size, Sort.by(orderBy));
+        }
+
+        return pageRequest;
+    }
+    public DriverPageResponse getDriverPage(int page, int size, String orderBy) {
+
+        PageRequest pageRequest = getPageRequest(page, size, orderBy);
+        Page<Driver> driverPage = driverRepository.findAll(pageRequest);
+
+        List<Driver> retrievedDrivers = driverPage.getContent();
+        long total = driverPage.getTotalElements();
+
+        List<DriverResponse> passengers = retrievedDrivers.stream()
+                .map(this::fromEntityToResponse)
+                .toList();
+
+        return DriverPageResponse.builder()
+                .driverList(passengers)
+                .totalPages(page)
+                .totalElements(total)
+                .build();
+    }
+    private void validateSortingParameter(String orderBy) {
+        List<String> fieldNames = Arrays.stream(DriverResponse.class.getDeclaredFields())
+                .map(Field::getName)
+                .toList();
+
+        if (!fieldNames.contains(orderBy)) {
+            throw new SortTypeException(ExceptionMessages.INVALID_TYPE_OF_SORT);
+        }
     }
 
     public ResponseEntity<Page<DriverResponse>> getPaginationList(Integer offset, Integer limit) {

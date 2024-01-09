@@ -2,6 +2,7 @@ package com.modsen.driverservice.controller;
 
 import com.modsen.driverservice.dto.request.DriverRequest;
 import com.modsen.driverservice.dto.response.DriverListResponse;
+import com.modsen.driverservice.dto.response.DriverPageResponse;
 import com.modsen.driverservice.dto.response.DriverResponse;
 import com.modsen.driverservice.exception.*;
 import com.modsen.driverservice.service.DriverService;
@@ -14,87 +15,82 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/drivers")
+@RequestMapping("/api/v1/drivers")
 public class DriverController {
 
     private final DriverService driverService;
 
     @GetMapping("/{id}")
     public ResponseEntity<DriverResponse> getDriverById(
-            @PathVariable Long id) throws DriverNotFoundException {
-        return driverService.getDriverById(id);
+            @PathVariable Long id) {
+        return ResponseEntity.ok(driverService.getDriverById(id));
     }
 
-    @GetMapping("/list-of-drivers")
+    @GetMapping("/list")
     public ResponseEntity<DriverListResponse> getListOfDrivers(){
         return driverService.getListOfDrivers();
     }
 
-    @PutMapping("/{id}/update")
+    @PutMapping("/{id}")
     public ResponseEntity<DriverResponse> updateDriver(
             @PathVariable Long id,
-            @Valid @RequestBody DriverRequest driverRequest) throws DriverNotFoundException, PhoneAlreadyExistException, EmailAlreadyExistException, CarNumberAlreadyExistException {
+            @Valid @RequestBody DriverRequest driverRequest) {
         return driverService.updateDriver(id,driverRequest);
     }
 
-    @DeleteMapping("/{id}/delete")
+    @DeleteMapping("/{id}")
     public HttpStatus deleteDriver(
-            @PathVariable Long id) throws DriverNotFoundException {
+            @PathVariable Long id) {
         return driverService.deleteDriver(id);
     }
 
-    @PostMapping("/create-driver")
+    @PostMapping
     public ResponseEntity<DriverResponse> createDriver(
-            @Valid @RequestBody DriverRequest driverRequest) throws EmailAlreadyExistException, PhoneAlreadyExistException, CarNumberAlreadyExistException {
+            @Valid @RequestBody DriverRequest driverRequest) {
         return driverService.createDriver(driverRequest);
     }
 
-    @GetMapping("/get-list-with-pagination")
-    public ResponseEntity<Page<DriverResponse>> getSortedListOfDrivers(
+    @GetMapping("/page")
+    public ResponseEntity<DriverPageResponse> getSortedListOfDrivers(
             @RequestParam("offset") Integer offset,
-            @RequestParam("limit") Integer limit
+            @RequestParam("limit") Integer limit,
+            @RequestParam(name = "type",required = false) String type
     ){
-        return driverService.getPaginationList(offset,limit);
+        return ResponseEntity.ok(driverService.getDriverPage(offset,limit,type));
     }
 
-    @GetMapping("/sorted-list")
-    public ResponseEntity<DriverListResponse> SortedListOfDrivers(
-            @RequestParam String type) throws  SortTypeException {
-        return driverService.getSortedListOfPassengers(type);
-    }
-
-    @GetMapping("/get-available-drivers")
+    @GetMapping("/available")
     public ResponseEntity<DriverListResponse> getAvailableDrivers(){
         return driverService.getAvailableDrivers();
     }
 
     @PutMapping("/start-ride/{driver_id}")
     public ResponseEntity<DriverResponse> startRide(
-            @PathVariable("driver_id") Long driver_id) throws DriverNotFoundException {
+            @PathVariable("driver_id") Long driver_id) {
         return driverService.startRideWithDriverId(driver_id);
     }
 
     @PutMapping("/end-ride/{driver_id}")
     public ResponseEntity<DriverResponse> endRide(
-            @PathVariable("driver_id") Long driver_id) throws DriverNotFoundException {
+            @PathVariable("driver_id") Long driver_id) {
         return driverService.endRide(driver_id);
     }
 
-    @PutMapping("/{driver_id}/start-working-day")
+    @PutMapping("/{driver_id}/start-day")
     public HttpStatus startWorkingDayForDriverWithId(
-            @PathVariable("driver_id") Long id) throws DriverNotFoundException {
+            @PathVariable("driver_id") Long id) {
         return driverService.startWorkingDay(id);
     }
 
-    @PutMapping("/{driver_id}/end-working-day")
+    @PutMapping("/{driver_id}/end-day")
     public HttpStatus endWorkingDayForDriverWithId(
-            @PathVariable Long driver_id) throws DriverNotFoundException {
+            @PathVariable Long driver_id) {
         return driverService.endWorkingDay(driver_id);
     }
 
-    @GetMapping("/get-driver-by-car-number/{car_number}")
+    @GetMapping("/get-by-car-number/{car_number}")
     public ResponseEntity<DriverResponse> getDriverByCarNumber(
-            @PathVariable String car_number) throws DriverNotFoundException {
+            @PathVariable String car_number) {
         return driverService.getDriverByCarNumber(car_number);
     }
 
